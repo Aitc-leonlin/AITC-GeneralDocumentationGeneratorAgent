@@ -1,0 +1,160 @@
+{
+  "phase": 8,
+  "scope": "Notification, Admin Dashboard, Integration Smoke Test",
+  "results": [
+    {
+      "name": "seed_data_and_migrations",
+      "status": "passed",
+      "details": {
+        "migrationVersion": "V1.4",
+        "migrationFile": "/Users/leonlin/Cursor/BackEnd/AITC-CreditInvestigationChatBotAgent/src/sql/migrations/V1.4__add_organization_data_permissions.sql",
+        "migrationFiles": [
+          "/Users/leonlin/Cursor/BackEnd/AITC-CreditInvestigationChatBotAgent/src/sql/migrations/V1.1__initialize_membership_authorization_schema.sql",
+          "/Users/leonlin/Cursor/BackEnd/AITC-CreditInvestigationChatBotAgent/src/sql/migrations/V1.2__add_membership_authentication_schema.sql",
+          "/Users/leonlin/Cursor/BackEnd/AITC-CreditInvestigationChatBotAgent/src/sql/migrations/V1.3__add_membership_rbac_permission_groups.sql",
+          "/Users/leonlin/Cursor/BackEnd/AITC-CreditInvestigationChatBotAgent/src/sql/migrations/V1.4__add_organization_data_permissions.sql"
+        ],
+        "seedCounts": {
+          "membership_organization_unit": 0,
+          "membership_user": 0,
+          "membership_user_credential": 0,
+          "membership_role": 0,
+          "membership_permission_group": 0,
+          "membership_permission": 0,
+          "membership_menu_item": 1,
+          "membership_notification_template": 5,
+          "membership_user_role": 0,
+          "membership_role_permission": 0,
+          "membership_role_menu_permission": 1
+        }
+      }
+    },
+    {
+      "name": "backend_py_compile",
+      "status": "passed",
+      "details": {
+        "command": "env PYTHONPYCACHEPREFIX=/tmp/aitc-backend-pycache venv/bin/python -m py_compile app.py src/membership/controllers/notification_controller.py src/membership/services/notification_service.py src/membership/repositories/notification_repository.py src/membership/repositories/auth_repository.py src/membership/repositories/rbac_repository.py src/membership/repositories/user_repository.py src/membership/services/user_service.py scripts/phase8_smoke_test.py"
+      }
+    },
+    {
+      "name": "backend_app_import",
+      "status": "passed",
+      "details": {
+        "command": "env PYTHONPYCACHEPREFIX=/tmp/aitc-backend-pycache venv/bin/python -c \"import app; print('app import ok')\""
+      }
+    },
+    {
+      "name": "admin_dashboard",
+      "status": "passed",
+      "details": {
+        "keys": [
+          "loginStats",
+          "notificationStats",
+          "permissionOverview",
+          "recentAuditLogs",
+          "userStats"
+        ]
+      }
+    },
+    {
+      "name": "email_notification_templates",
+      "status": "passed",
+      "details": {
+        "templateCodes": [
+          "AUTH_EMAIL_VERIFICATION",
+          "AUTH_LOGIN_ANOMALY",
+          "AUTH_PASSWORD_RESET",
+          "MEMBERSHIP_ACCOUNT_LOCKED",
+          "RBAC_PERMISSION_CHANGED"
+        ]
+      }
+    },
+    {
+      "name": "password_reset_notification",
+      "status": "passed",
+      "details": {
+        "total": 2
+      }
+    },
+    {
+      "name": "account_locked_notification",
+      "status": "passed",
+      "details": {
+        "total": 1
+      }
+    },
+    {
+      "name": "login_anomaly_notification",
+      "status": "passed",
+      "details": {
+        "total": 1
+      }
+    },
+    {
+      "name": "permission_changed_notification",
+      "status": "passed",
+      "details": {
+        "total": 1
+      }
+    },
+    {
+      "name": "audit_log_query",
+      "status": "passed",
+      "details": {
+        "total": 6
+      }
+    },
+    {
+      "name": "notification_dispatch_api",
+      "status": "passed",
+      "details": {
+        "status": "SENT"
+      }
+    },
+    {
+      "name": "http_api_test",
+      "status": "passed",
+      "details": {
+        "tool": "FastAPI TestClient",
+        "endpoints": [
+          "POST /api/membership/auth/login",
+          "GET /api/membership/admin/dashboard",
+          "GET /api/membership/admin/audit-logs",
+          "GET /api/membership/admin/notification-templates",
+          "GET /api/membership/admin/notification-outbox"
+        ]
+      }
+    },
+    {
+      "name": "frontend_lint",
+      "status": "passed",
+      "details": {
+        "command": "npm run lint"
+      }
+    },
+    {
+      "name": "frontend_build",
+      "status": "passed",
+      "details": {
+        "command": "npm run build",
+        "verifiedRoutes": [
+          "/membership/dashboard",
+          "/membership/audit",
+          "/membership/notifications"
+        ]
+      }
+    },
+    {
+      "name": "e2e_test",
+      "status": "skipped",
+      "details": {
+        "reason": "no existing E2E test configuration found for membership admin"
+      }
+    }
+  ],
+  "summary": {
+    "passed": 14,
+    "failed": 0,
+    "skipped": 1
+  }
+}

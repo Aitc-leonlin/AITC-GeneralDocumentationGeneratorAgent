@@ -1,0 +1,685 @@
+erDiagram
+    %% Generated from live postgresql database mydb, schema public.
+    %% 46 tables; 467 columns; 40 declared FKs.
+    %% Solid edges are declared SQL foreign keys. Dashed edges are selected
+    %% application-level joins, not enforced by the database.
+    %% NULLability and composite UNIQUE constraints are not shown as field badges.
+
+    chat_conversation {
+        TEXT id PK
+        TEXT user_id FK
+        TEXT title
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    %% UNIQUE chat_conversation_message (conversation_id, sort_order)
+    chat_conversation_message {
+        TEXT id PK
+        TEXT conversation_id PK,FK
+        TEXT role
+        TEXT content_json
+        INTEGER sort_order
+        TEXT data_sources_json
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    chat_document {
+        TEXT document_id PK
+        TEXT chat_id FK
+        TEXT upload_user_id FK
+        TEXT case_id
+        TEXT file_name
+        TEXT file_type
+        TEXT mime_type
+        BIGINT file_size_bytes
+        TEXT status
+        TEXT created_at
+        TEXT updated_at
+        TEXT storage_key
+    }
+
+    chat_message_document {
+        TEXT conversation_id PK,FK
+        TEXT message_id PK,FK
+        TEXT document_id PK,FK
+        INTEGER sort_order
+    }
+
+    %% UNIQUE chat_message_expert_knowledge (conversation_id, message_id, sort_order)
+    chat_message_expert_knowledge {
+        BIGINT id PK
+        TEXT conversation_id FK
+        TEXT message_id FK
+        INTEGER sort_order
+        TEXT title
+        TEXT anchor_description
+        TEXT system_prompt
+        TEXT source_created_at
+        TEXT source_updated_at
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    %% UNIQUE chat_message_external_data (conversation_id, message_id, sort_order)
+    chat_message_external_data {
+        BIGINT id PK
+        TEXT conversation_id FK
+        TEXT message_id FK
+        INTEGER sort_order
+        TEXT source
+        TEXT response
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    checkpoint_blobs {
+        TEXT thread_id PK
+        TEXT checkpoint_ns PK
+        TEXT channel PK
+        TEXT version PK
+        TEXT type
+        BYTEA blob
+    }
+
+    checkpoint_migrations {
+        INTEGER v PK
+    }
+
+    checkpoint_writes {
+        TEXT thread_id PK
+        TEXT checkpoint_ns PK
+        TEXT checkpoint_id PK
+        TEXT task_id PK
+        INTEGER idx PK
+        TEXT channel
+        TEXT type
+        BYTEA blob
+        TEXT task_path
+    }
+
+    checkpoints {
+        TEXT thread_id PK
+        TEXT checkpoint_ns PK
+        TEXT checkpoint_id PK
+        TEXT parent_checkpoint_id
+        TEXT type
+        JSONB checkpoint
+        JSONB metadata
+    }
+
+    company_profile {
+        TEXT publication_date
+        TEXT company_code PK
+        TEXT company_name
+        TEXT company_short_name
+        TEXT foreign_registration_country
+        TEXT industry_code
+        TEXT address
+        TEXT tax_id
+        TEXT chairman
+        TEXT general_manager
+        TEXT spokesperson
+        TEXT spokesperson_title
+        TEXT acting_spokesperson
+        TEXT telephone
+        TEXT incorporation_date
+        TEXT listing_date
+        TEXT par_value
+        TEXT paid_in_capital
+        TEXT private_placement_shares
+        TEXT preferred_shares
+        TEXT financial_statement_type
+        TEXT stock_transfer_agent
+        TEXT transfer_agent_phone
+        TEXT transfer_agent_address
+        TEXT cpa_firm
+        TEXT cpa_1
+        TEXT cpa_2
+        TEXT english_short_name
+        TEXT english_mailing_address
+        TEXT fax
+        TEXT email
+        TEXT website
+        TEXT issued_common_shares_or_tdr_shares
+        TEXT source_json
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    expert_knowledge_entry {
+        TEXT id PK
+        TEXT title
+        TEXT data_source
+        TEXT industry
+        TEXT company_label
+        TEXT company_prompt_value
+        TEXT source_schema_key
+        TEXT anchor_description
+        TEXT system_prompt
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    field_concept_mapping {
+        BIGINT id PK
+        TEXT field_id
+        TEXT concept_id
+        TEXT taxonomy_id
+        TEXT industry_type
+        INTEGER priority
+        TEXT effective_from
+        TEXT effective_to
+    }
+
+    field_dictionary {
+        TEXT field_id PK
+        TEXT canonical_name
+        TEXT zh_name
+        TEXT en_name
+        TEXT module
+        TEXT statement_type
+        TEXT value_type
+        TEXT description
+    }
+
+    financial_metric_value {
+        TEXT company_code
+        INTEGER year
+        TEXT quarter
+        TEXT report_scope
+        TEXT industry_type
+        TEXT field_id PK
+        TEXT concept_id
+        DOUBLE_PRECISION value
+        TEXT report_id
+        TEXT fact_id PK
+        TEXT period_start
+        TEXT period_end
+    }
+
+    membership_audit_log {
+        TEXT id PK
+        TEXT actor_user_id FK
+        TEXT action
+        TEXT resource_type
+        TEXT resource_id
+        TEXT outcome
+        TEXT ip_address
+        TEXT user_agent
+        TEXT metadata_json
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_audit_retention_setting {
+        INTEGER id PK
+        INTEGER retention_days
+        TEXT last_checked_date
+        TEXT last_run_at
+        TEXT last_archive_at
+        INTEGER last_archived_count
+        TEXT last_cutoff_at
+        TEXT last_archive_filename
+        TEXT last_error
+        TEXT updated_by_user_id FK
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    membership_data_scope {
+        TEXT id PK
+        TEXT role_id FK
+        TEXT scope_type
+        TEXT organization_id FK
+        TEXT rule_json
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_email_verification_token {
+        TEXT id PK
+        TEXT user_id FK
+        TEXT token_hash UK
+        TEXT expires_at
+        TEXT verified_at
+        TEXT requested_ip_address
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_group {
+        TEXT id PK
+        TEXT code
+        TEXT name
+        TEXT category
+        TEXT description
+        TEXT master_user_id FK
+        TEXT status
+        TEXT created_by_user_id FK
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    %% UNIQUE membership_group_member (group_id, user_id)
+    membership_group_member {
+        TEXT id PK
+        TEXT group_id FK
+        TEXT user_id FK
+        TEXT added_by_user_id FK
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_notification_outbox {
+        TEXT id PK
+        TEXT template_code
+        TEXT recipient_user_id FK
+        TEXT channel
+        TEXT payload_json
+        TEXT status
+        TEXT scheduled_at
+        TEXT sent_at
+        TEXT error_message
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_notification_template {
+        TEXT id PK
+        TEXT code UK
+        TEXT channel
+        TEXT subject
+        TEXT body
+        TEXT status
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_organization_unit {
+        TEXT id PK
+        TEXT code UK
+        TEXT name
+        TEXT parent_id FK
+        TEXT path
+        INTEGER level
+        TEXT unit_type
+        TEXT company_id
+        TEXT manager_user_id FK
+        TEXT description
+        TEXT status
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_password_reset_token {
+        TEXT id PK
+        TEXT user_id FK
+        TEXT token_hash UK
+        TEXT expires_at
+        TEXT used_at
+        TEXT requested_ip_address
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_position {
+        TEXT id PK
+        TEXT name
+        TEXT description
+        INTEGER level
+        TEXT status
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_refresh_token {
+        TEXT id PK
+        TEXT user_id FK
+        TEXT token_hash UK
+        TEXT session_id
+        TEXT device_id
+        TEXT ip_address
+        TEXT user_agent
+        TEXT expires_at
+        TEXT revoked_at
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_role {
+        TEXT id PK
+        TEXT code UK
+        TEXT name
+        TEXT description
+        TEXT role_type
+        TEXT status
+        INTEGER is_system
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    %% UNIQUE membership_role_permission (permission_code, role_id)
+    membership_role_permission {
+        TEXT id PK
+        TEXT role_id FK
+        TEXT permission_code
+        TEXT effect
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_schema_migrations {
+        TEXT version PK
+        TEXT description
+        TIMESTAMP applied_at
+    }
+
+    membership_session {
+        TEXT id PK
+        TEXT user_id FK
+        TEXT refresh_token_id FK
+        TEXT device_id
+        TEXT ip_address
+        TEXT user_agent
+        INTEGER remember_me
+        TEXT started_at
+        TEXT last_seen_at
+        TEXT expires_at
+        TEXT revoked_at
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    membership_user {
+        TEXT id PK
+        TEXT username UK
+        TEXT email UK
+        TEXT display_name
+        TEXT employee_no
+        TEXT organization_id FK
+        TEXT status
+        TEXT locale
+        TEXT timezone
+        TEXT email_verified_at
+        TEXT last_login_at
+        TEXT last_login_ip
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+        TEXT position_id FK
+    }
+
+    membership_user_credential {
+        TEXT id PK
+        TEXT user_id FK,UK
+        TEXT password_hash
+        TEXT password_algorithm
+        TEXT password_changed_at
+        INTEGER must_change_password
+        INTEGER mfa_enabled
+        INTEGER failed_login_count
+        TEXT last_failed_login_at
+        TEXT last_failed_login_ip
+        TEXT locked_until
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    %% UNIQUE membership_user_department_mapping (organization_id, position_id, user_id)
+    membership_user_department_mapping {
+        TEXT id PK
+        TEXT user_id FK
+        TEXT organization_id FK
+        TEXT position_id FK
+        INTEGER is_primary
+        TEXT effective_from
+        TEXT effective_to
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    %% UNIQUE membership_user_manager_relation (employee_user_id, manager_user_id, organization_id)
+    membership_user_manager_relation {
+        TEXT id PK
+        TEXT manager_user_id FK
+        TEXT employee_user_id FK
+        TEXT organization_id FK
+        TEXT relation_type
+        TEXT status
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    %% UNIQUE membership_user_role (organization_id, role_id, user_id)
+    membership_user_role {
+        TEXT id PK
+        TEXT user_id FK
+        TEXT role_id FK
+        TEXT organization_id FK
+        TEXT effective_from
+        TEXT effective_to
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    report_generator_dashboard {
+        BIGINT id PK
+        BIGINT history_id FK,UK
+        TEXT summary_items_json
+        TEXT progress_items_json
+        INTEGER progress_percent
+        TEXT metrics_title
+        TEXT metrics_json
+        TEXT financial_trends_json
+        TEXT created_at
+        TEXT updated_at
+    }
+
+    report_generator_history {
+        BIGINT id PK
+        TEXT title
+        TEXT company
+        TEXT company_code
+        TEXT company_label
+        TEXT year
+        TEXT period
+        TEXT report_type
+        TEXT generated_at
+        TEXT generated_at_display
+        TEXT generated_by
+        TEXT status
+        TEXT file_size
+        TEXT file_name
+        TEXT file_path
+        TEXT mime_type
+        TEXT created_at
+        TEXT public_id UK
+        TEXT created_by_user_id FK
+    }
+
+    report_instance {
+        TEXT report_id PK
+        TEXT company_code
+        INTEGER year
+        TEXT quarter
+        TEXT industry_type
+        TEXT report_scope
+        TEXT taxonomy_version
+        TEXT module
+        TEXT file_name
+        TEXT source_type
+        DATE period_start
+        DATE period_end
+    }
+
+    schema_migrations {
+        TEXT version PK
+        TEXT description
+        TIMESTAMP applied_at
+    }
+
+    taxonomy_calculation {
+        TEXT taxonomy_id
+        TEXT role_uri
+        TEXT parent_concept_id
+        TEXT child_concept_id
+        DOUBLE_PRECISION weight
+        DOUBLE_PRECISION order_no
+        BIGINT id PK
+    }
+
+    taxonomy_concept {
+        TEXT concept_id PK
+        TEXT taxonomy_id
+        TEXT namespace
+        TEXT local_name
+        TEXT zh_label
+        TEXT en_label
+        TEXT terse_code
+        TEXT period_type
+        TEXT balance_type
+        TEXT data_type
+        INTEGER is_abstract
+    }
+
+    taxonomy_entry_point {
+        TEXT taxonomy_id PK
+        TEXT taxonomy_version
+        TEXT module
+        TEXT entry_point
+        TEXT xsd_file
+        TEXT presentation_file
+        TEXT label_file
+        TEXT calculation_file
+    }
+
+    taxonomy_presentation {
+        TEXT taxonomy_id
+        TEXT role_uri
+        TEXT parent_concept_id
+        TEXT child_concept_id
+        DOUBLE_PRECISION order_no
+        TEXT preferred_label
+        INTEGER depth
+        BIGINT id PK
+    }
+
+    warehouse_data_entry {
+        TEXT id PK
+        TEXT category
+        TEXT title
+        TEXT industry
+        TEXT company_label
+        TEXT company_prompt_value
+        TEXT summary
+        TEXT source
+        TEXT url
+        TEXT record_updated_at
+        TEXT created_at
+        TEXT updated_at
+        TEXT deleted_at
+    }
+
+    xbrl_fact {
+        TEXT fact_id PK
+        TEXT report_id
+        TEXT concept_id
+        TEXT context_id
+        TEXT unit_id
+        DOUBLE_PRECISION value_numeric
+        TEXT value_text
+        INTEGER decimals
+        INTEGER scale
+        DATE instant_date
+        DATE period_start
+        DATE period_end
+        TEXT segment_json
+    }
+
+    %% Declared SQL foreign keys
+
+    membership_user ||--o{ chat_conversation : "user_id to id"
+    chat_conversation ||--o{ chat_conversation_message : "conversation_id to id"
+    chat_conversation ||--o{ chat_document : "chat_id to id"
+    membership_user ||--o{ chat_document : "upload_user_id to id"
+    chat_conversation_message ||--o{ chat_message_document : "conversation_id,message_id to conversation_id,id"
+    chat_document ||--o| chat_message_document : "document_id to document_id"
+    chat_conversation_message ||--o{ chat_message_expert_knowledge : "conversation_id,message_id to conversation_id,id"
+    chat_conversation_message ||--o{ chat_message_external_data : "conversation_id,message_id to conversation_id,id"
+    membership_user o|--o{ membership_audit_log : "actor_user_id to id"
+    membership_user o|--o{ membership_audit_retention_setting : "updated_by_user_id to id"
+    membership_organization_unit o|--o{ membership_data_scope : "organization_id to id"
+    membership_role ||--o{ membership_data_scope : "role_id to id"
+    membership_user ||--o{ membership_email_verification_token : "user_id to id"
+    membership_user o|--o{ membership_group : "created_by_user_id to id"
+    membership_user o|--o{ membership_group : "master_user_id to id"
+    membership_user o|--o{ membership_group_member : "added_by_user_id to id"
+    membership_group ||--o{ membership_group_member : "group_id to id"
+    membership_user ||--o{ membership_group_member : "user_id to id"
+    membership_user o|--o{ membership_notification_outbox : "recipient_user_id to id"
+    membership_user o|--o{ membership_organization_unit : "manager_user_id to id"
+    membership_organization_unit o|--o{ membership_organization_unit : "parent_id to id"
+    membership_user ||--o{ membership_password_reset_token : "user_id to id"
+    membership_user ||--o{ membership_refresh_token : "user_id to id"
+    membership_role ||--o{ membership_role_permission : "role_id to id"
+    membership_refresh_token o|--o{ membership_session : "refresh_token_id to id"
+    membership_user ||--o{ membership_session : "user_id to id"
+    membership_position o|--o{ membership_user : "position_id to id"
+    membership_organization_unit o|--o{ membership_user : "organization_id to id"
+    membership_user ||--o| membership_user_credential : "user_id to id"
+    membership_organization_unit ||--o{ membership_user_department_mapping : "organization_id to id"
+    membership_position o|--o{ membership_user_department_mapping : "position_id to id"
+    membership_user ||--o{ membership_user_department_mapping : "user_id to id"
+    membership_user ||--o{ membership_user_manager_relation : "employee_user_id to id"
+    membership_user ||--o{ membership_user_manager_relation : "manager_user_id to id"
+    membership_organization_unit o|--o{ membership_user_manager_relation : "organization_id to id"
+    membership_organization_unit o|--o{ membership_user_role : "organization_id to id"
+    membership_role ||--o{ membership_user_role : "role_id to id"
+    membership_user ||--o{ membership_user_role : "user_id to id"
+    report_generator_history ||--o| report_generator_dashboard : "history_id to id"
+    membership_user o|--o{ report_generator_history : "created_by_user_id to id"
+
+    %% Application-level joins (not declared SQL foreign keys)
+
+    company_profile o|..o{ report_instance : "company_code to company_code logical"
+    company_profile o|..o{ financial_metric_value : "company_code to company_code logical"
+    company_profile o|..o{ report_generator_history : "company_code to company_code logical"
+    taxonomy_entry_point o|..o{ taxonomy_concept : "taxonomy_id to taxonomy_id logical"
+    taxonomy_entry_point o|..o{ taxonomy_presentation : "taxonomy_id to taxonomy_id logical"
+    taxonomy_entry_point o|..o{ taxonomy_calculation : "taxonomy_id to taxonomy_id logical"
+    taxonomy_entry_point o|..o{ field_concept_mapping : "taxonomy_id to taxonomy_id logical"
+    taxonomy_concept o|..o{ taxonomy_presentation : "parent_concept_id to concept_id logical"
+    taxonomy_concept o|..o{ taxonomy_presentation : "child_concept_id to concept_id logical"
+    taxonomy_concept o|..o{ taxonomy_calculation : "parent_concept_id to concept_id logical"
+    taxonomy_concept o|..o{ taxonomy_calculation : "child_concept_id to concept_id logical"
+    taxonomy_concept o|..o{ xbrl_fact : "concept_id to concept_id logical"
+    taxonomy_concept o|..o{ financial_metric_value : "concept_id to concept_id logical"
+    taxonomy_concept o|..o{ field_concept_mapping : "concept_id to concept_id logical"
+    report_instance o|..o{ xbrl_fact : "report_id to report_id logical"
+    report_instance o|..o{ financial_metric_value : "report_id to report_id logical"
+    field_dictionary o|..o{ field_concept_mapping : "field_id to field_id logical"
+    field_dictionary o|..o{ financial_metric_value : "field_id to field_id logical"
+    xbrl_fact o|..o{ financial_metric_value : "fact_id to fact_id logical"
+    membership_notification_template o|..o{ membership_notification_outbox : "template_code to code logical"

@@ -1,0 +1,41 @@
+{
+  "documentTypeId": "D28",
+  "isSynthetic": true,
+  "title": "示範 Python 自學計畫資料",
+  "subject": "試算表自動化初學者",
+  "period": "8 週",
+  "objective": "規劃從基礎語法到小型專案的學習路線",
+  "context": "使用者具備試算表操作經驗，希望能自動整理 CSV。",
+  "facts": [
+    {
+      "label": "每週可投入時間",
+      "value": "5 小時"
+    },
+    {
+      "label": "學習週數",
+      "value": "8 週"
+    },
+    {
+      "label": "現有能力",
+      "value": "熟悉試算表、尚未使用 Python"
+    },
+    {
+      "label": "目標成果",
+      "value": "完成 CSV 清理小專案"
+    }
+  ],
+  "sourceMaterials": [
+    {
+      "title": "模擬學習需求問卷",
+      "content": "記錄起點、時間與目標。"
+    },
+    {
+      "title": "模擬練習資料",
+      "content": "提供不含個資的虛構 CSV 欄位。"
+    }
+  ],
+  "assumptions": [
+    "進度依實際學習情況調整。"
+  ],
+  "sourceNote": "此案例的名稱、情境、資料與數值均為虛構測試資料，僅供文件產生流程開發與驗證。"
+}

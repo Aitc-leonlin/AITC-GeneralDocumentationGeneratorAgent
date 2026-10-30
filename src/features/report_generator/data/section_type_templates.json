@@ -1,0 +1,22 @@
+[
+  {"id": "S01", "name": "摘要／執行摘要", "purpose": "濃縮文件核心資訊", "suggestedContentTypeIds": ["C02", "C03"], "commonDocuments": ["研究", "分析", "企劃"]},
+  {"id": "S02", "name": "背景介紹", "purpose": "說明主題背景與相關脈絡", "suggestedContentTypeIds": ["C01", "C02", "C12"], "commonDocuments": ["研究", "企劃", "賞析"]},
+  {"id": "S03", "name": "目標與目的", "purpose": "說明文件或專案希望達成的成果", "suggestedContentTypeIds": ["C01", "C03"], "commonDocuments": ["企劃", "SRS", "研究"]},
+  {"id": "S04", "name": "範圍與限制", "purpose": "定義討論邊界、假設及限制條件", "suggestedContentTypeIds": ["C01", "C03"], "commonDocuments": ["SRS", "合約", "研究"]},
+  {"id": "S05", "name": "現況分析", "purpose": "整理目前狀態及既有問題", "suggestedContentTypeIds": ["C01", "C04", "C05", "C10"], "commonDocuments": ["分析", "企劃", "評估"]},
+  {"id": "S06", "name": "資料來源與依據", "purpose": "說明資料、引用來源及可信度", "suggestedContentTypeIds": ["C03", "C11", "C12"], "commonDocuments": ["研究", "財務", "法律"]},
+  {"id": "S07", "name": "研究／評估方法", "purpose": "說明分析方法、計算方式及評估標準", "suggestedContentTypeIds": ["C01", "C15", "C16"], "commonDocuments": ["研究", "測試", "評估"]},
+  {"id": "S08", "name": "數據與統計分析", "purpose": "分析量化資料及統計結果", "suggestedContentTypeIds": ["C04", "C05", "C13", "C16"], "commonDocuments": ["財務", "市場", "測試"]},
+  {"id": "S09", "name": "趨勢解析", "purpose": "分析歷史變化及未來發展方向", "suggestedContentTypeIds": ["C04", "C06", "C13"], "commonDocuments": ["產業", "市場", "財務"]},
+  {"id": "S10", "name": "比較分析", "purpose": "比較不同對象、期間或方案", "suggestedContentTypeIds": ["C07", "C08", "C13"], "commonDocuments": ["競品", "決策", "財務"]},
+  {"id": "S11", "name": "問題與原因分析", "purpose": "找出問題及可能的根本原因", "suggestedContentTypeIds": ["C03", "C10", "C11"], "commonDocuments": ["調查", "風險", "企劃"]},
+  {"id": "S12", "name": "風險與影響評估", "purpose": "分析風險、影響程度及發生可能性", "suggestedContentTypeIds": ["C09", "C17", "C18"], "commonDocuments": ["授信", "專案", "法律"]},
+  {"id": "S13", "name": "案例研究與舉證", "purpose": "透過實際案例或證據支持論點", "suggestedContentTypeIds": ["C01", "C11", "C12"], "commonDocuments": ["研究", "法律", "賞析"]},
+  {"id": "S14", "name": "功能／需求說明", "purpose": "定義功能、需求及驗收條件", "suggestedContentTypeIds": ["C01", "C03", "C04"], "commonDocuments": ["SRS", "企劃", "設計"]},
+  {"id": "S15", "name": "架構與設計說明", "purpose": "說明系統、流程或方案的設計結構", "suggestedContentTypeIds": ["C01", "C14", "C15"], "commonDocuments": ["SDD", "企劃", "教學"]},
+  {"id": "S16", "name": "執行流程與操作步驟", "purpose": "說明操作順序及執行方法", "suggestedContentTypeIds": ["C03", "C14", "C15"], "commonDocuments": ["SOP", "教學", "測試"]},
+  {"id": "S17", "name": "成本與效益評估", "purpose": "評估資源投入、成本及預期價值", "suggestedContentTypeIds": ["C04", "C05", "C16", "C17"], "commonDocuments": ["企劃", "可行性", "決策"]},
+  {"id": "S18", "name": "結果與成效驗證", "purpose": "說明執行結果、驗證方式及達成程度", "suggestedContentTypeIds": ["C04", "C05", "C13", "C20"], "commonDocuments": ["測試", "研究", "專案"]},
+  {"id": "S19", "name": "建議與改善方案", "purpose": "提出具體改善措施或行動方向", "suggestedContentTypeIds": ["C03", "C17", "C19"], "commonDocuments": ["授信", "風險", "決策"]},
+  {"id": "S20", "name": "結論與後續展望", "purpose": "彙整最終發現及未來方向", "suggestedContentTypeIds": ["C02", "C19", "C20"], "commonDocuments": ["研究", "分析", "企劃"]}
+]

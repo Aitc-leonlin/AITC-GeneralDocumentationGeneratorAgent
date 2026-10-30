@@ -1,0 +1,29 @@
+flowchart TD
+    USER["使用者輸入或點選範例問題"] --> API["POST /api/report-generator/<br/>threads/{thread_id}/messages"]
+    API --> CONTEXT["load_context<br/>讀取對話與 Document Type 清單"]
+    CONTEXT --> CLASSIFY["classify_question<br/>判斷意圖、用途與參考類型"]
+    TYPES["Document Type 只供參考<br/>任何領域都可提出需求"] -.-> CLASSIFY
+
+    CLASSIFY --> INTENT{"這次要做什麼？"}
+    INTENT -- "提問或與文件無關" --> ANSWER["answer_question<br/>回答，保留目前大綱"]
+    INTENT -- "建立或修改文件" --> ASSESS["assess_readiness<br/>判斷是否需要追問"]
+    ASSESS --> NEED{"需要使用者補充決定？"}
+    NEED -- "是" --> CLARIFY["clarify<br/>回傳一個具體問題"]
+    NEED -- "否" --> SOURCE["resolve_source_mode<br/>決定資料來源"]
+
+    SOURCE --> SAMPLE{"選用測試 JSON？"}
+    SAMPLE -- "是" --> LOAD_SAMPLE["load_sample_json<br/>讀取對應的虛構案例"]
+    SAMPLE -- "否" --> PLAN["plan_purpose_document<br/>依用途規劃章節與大綱"]
+    LOAD_SAMPLE --> PLAN
+
+    ANSWER --> RESPONSE["回傳本次回答"]
+    CLARIFY --> RESPONSE
+    PLAN --> RESPONSE
+    RESPONSE --> THREAD["Thread 保存對話與目前規劃"]
+    RESPONSE --> TRACE["前端 localStorage<br/>記錄最新回答的 Graph Nodes"]
+
+    THREAD -- "另外呼叫 execute-general" --> EXEC["執行已接入的內容工具<br/>結果只回傳"]
+    THREAD -- "另外呼叫 generate" --> DOCX["下載目前版本 DOCX"]
+
+    %% /draft 使用相同的對話 Graph，但不保存 Thread。
+    %% 既存固定格式資料的相容下載及單一 Document Type 的 /replan 入口未列入此主流程圖。

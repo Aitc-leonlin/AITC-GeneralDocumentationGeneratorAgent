@@ -1,0 +1,22 @@
+[
+  {"id": "C01", "name": "一般敘述文字", "nature": "呈現", "description": "描述背景、事實及資訊", "requiredCapabilities": ["RAG", "文字生成"]},
+  {"id": "C02", "name": "摘要整理", "nature": "分析", "description": "將大量資訊濃縮成重點", "requiredCapabilities": ["RAG", "Summarization"]},
+  {"id": "C03", "name": "關鍵重點清單", "nature": "呈現", "description": "條列重要資訊與發現", "requiredCapabilities": ["Information Extraction"]},
+  {"id": "C04", "name": "數據表格", "nature": "呈現", "description": "呈現量化資料與指標", "requiredCapabilities": ["SQL", "API", "Data Mapping"]},
+  {"id": "C05", "name": "統計分析", "nature": "分析", "description": "計算平均值、比例、分布等統計結果", "requiredCapabilities": ["Statistical Analysis"]},
+  {"id": "C06", "name": "趨勢分析", "nature": "分析", "description": "分析時間序列變化及發展方向", "requiredCapabilities": ["Time Series Analysis"]},
+  {"id": "C07", "name": "比較矩陣", "nature": "呈現", "description": "比較不同對象的特徵與差異", "requiredCapabilities": ["Comparison", "Data Alignment"]},
+  {"id": "C08", "name": "優劣勢分析", "nature": "分析", "description": "整理優點、缺點及競爭條件", "requiredCapabilities": ["SWOT", "Reasoning"]},
+  {"id": "C09", "name": "風險分析", "nature": "分析", "description": "識別風險來源、可能性與影響", "requiredCapabilities": ["Risk Analysis"]},
+  {"id": "C10", "name": "原因分析", "nature": "分析", "description": "分析事件、結果及潛在原因", "requiredCapabilities": ["Root Cause Analysis"]},
+  {"id": "C11", "name": "案例舉證", "nature": "證據", "description": "提供實際案例支持特定論點", "requiredCapabilities": ["RAG", "Evidence Retrieval"]},
+  {"id": "C12", "name": "文獻／法規引用", "nature": "證據", "description": "引用可信文件、法律條文或研究", "requiredCapabilities": ["Retrieval", "Citation"]},
+  {"id": "C13", "name": "圖表視覺化", "nature": "呈現", "description": "使用折線圖、長條圖等呈現資料", "requiredCapabilities": ["Data Visualization"]},
+  {"id": "C14", "name": "流程圖／架構圖", "nature": "呈現", "description": "呈現流程、元件或相依關係", "requiredCapabilities": ["Diagram Generation"]},
+  {"id": "C15", "name": "操作步驟", "nature": "程序", "description": "產生依序執行的操作指引", "requiredCapabilities": ["Procedure Generation"]},
+  {"id": "C16", "name": "計算公式與推導", "nature": "分析", "description": "定義計算方法、公式及結果", "requiredCapabilities": ["Formula Engine"]},
+  {"id": "C17", "name": "情境模擬", "nature": "分析", "description": "分析不同假設條件下的結果", "requiredCapabilities": ["Scenario Analysis"]},
+  {"id": "C18", "name": "評分與評級", "nature": "分析", "description": "依據指標、權重或規則計算評級", "requiredCapabilities": ["Scoring", "Rule Engine"]},
+  {"id": "C19", "name": "改善建議與行動方案", "nature": "建議", "description": "根據發現提出具體改善措施", "requiredCapabilities": ["Recommendation Generation"]},
+  {"id": "C20", "name": "結論與判斷", "nature": "分析", "description": "整合證據，產生最終結論", "requiredCapabilities": ["Evidence Synthesis", "Reasoning"]}
+]

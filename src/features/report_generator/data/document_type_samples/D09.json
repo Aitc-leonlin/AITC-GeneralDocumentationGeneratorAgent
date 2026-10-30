@@ -1,0 +1,45 @@
+{
+  "documentTypeId": "D09",
+  "isSynthetic": true,
+  "title": "示範門診預約系統設計資料",
+  "subject": "門診預約系統架構",
+  "period": "2027 年版本 1.0",
+  "objective": "描述元件、資料流與技術設計",
+  "context": "系統預計由網頁前端、API、排程服務與資料庫組成。",
+  "facts": [
+    {
+      "label": "主要元件",
+      "value": "網頁前端、API、通知佇列、資料庫"
+    },
+    {
+      "label": "資料庫",
+      "value": "示範 PostgreSQL"
+    },
+    {
+      "label": "通知方式",
+      "value": "模擬簡訊與電子郵件"
+    },
+    {
+      "label": "預計部署環境",
+      "value": "測試與正式環境分離"
+    },
+    {
+      "label": "權限角色",
+      "value": "病患、櫃檯、管理員"
+    }
+  ],
+  "sourceMaterials": [
+    {
+      "title": "模擬架構草圖說明",
+      "content": "描述元件連線與主要資料流。"
+    },
+    {
+      "title": "模擬資料字典",
+      "content": "列示預約、時段與通知紀錄欄位。"
+    }
+  ],
+  "assumptions": [
+    "實際資安審查與容量測試尚未完成。"
+  ],
+  "sourceNote": "此案例的名稱、情境、資料與數值均為虛構測試資料，僅供文件產生流程開發與驗證。"
+}

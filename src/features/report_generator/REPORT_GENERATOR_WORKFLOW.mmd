@@ -1,0 +1,105 @@
+flowchart TD
+    %% One diagram for every current report-generator LangGraph and its API entry.
+    ROOT["報告產生器"] --> API_OUTLINE["POST /draft<br/>POST /threads/{thread_id}/messages"]
+    ROOT --> API_REPLAN["POST /general-documents/replan"]
+    ROOT --> API_EXECUTE["POST /threads/{thread_id}/execute-general"]
+    ROOT --> API_THREAD_DOCX["POST /threads/{thread_id}/generate"]
+
+    %% Conversation planning. OUTLINE.classify_question invokes DOCUMENT_TYPE_GRAPH;
+    %% OUTLINE.classified invokes PURPOSE_WORKFLOW_GRAPH.
+    subgraph _OUTLINE_GRAPH
+        O_START((START)) --> O_LOAD["load_context"]
+        O_LOAD --> O_CLASSIFY["classify_question"]
+        O_INTENT{"intent"}
+        O_INTENT -->|ask_question / out_of_scope| O_ANSWER["answer_question<br/>LLM 回答問題"]
+        O_INTENT -->|create_report / revise_report| O_ASSESS["assess_readiness<br/>LLM 判斷資訊是否足夠"]
+        O_ASSESS --> O_READY{"需要追問？"}
+        O_READY -- 是 --> O_CLARIFY["clarify"]
+        O_READY -- 否 --> O_SOURCE["resolve_source_mode"]
+        O_SOURCE --> O_CLASSIFIED["classified"]
+        O_ANSWER --> O_END((END))
+        O_CLARIFY --> O_END
+    end
+
+    subgraph DOCUMENT_TYPE_GRAPH
+        D_START((START)) --> D_CLASSIFY["classify_question<br/>LLM 分類意圖與用途"]
+        D_CLASSIFY --> D_RESOLVE["resolve_document_type"]
+        D_RESOLVE --> D_END((END))
+    end
+
+    subgraph PURPOSE_WORKFLOW_GRAPH
+        P_START((START)) --> P_STRATEGY["route_purpose_strategy"]
+        P_STRATEGY --> P_PLAN["plan_each_purpose<br/>逐用途呼叫 LLM"]
+        P_PLAN --> P_MERGE["merge_purpose_sections<br/>多用途時由 LLM 合併"]
+        P_MERGE --> P_OUTLINE["draft_unified_outline<br/>LLM 產生大綱"]
+        P_OUTLINE --> P_END((END))
+    end
+
+    API_OUTLINE --> O_START
+    O_CLASSIFY -.->|呼叫| D_START
+    D_END -.->|回傳分類結果| O_INTENT
+    O_CLASSIFIED -.->|呼叫| P_START
+    P_END -.->|回傳大綱| O_END
+    O_END --> OUTLINE_RESULT["回傳或保存 ReportOutlineResponse"]
+
+    %% Independent single-D replan. startAt is a Python-level choice, not a node.
+    API_REPLAN --> REPLAN_STAGE{"startAt"}
+    REPLAN_STAGE -- sections --> S_START
+    REPLAN_STAGE -- contents --> C_START
+    REPLAN_STAGE -- outline --> G_START
+
+    subgraph SECTION_GRAPH
+        S_START((START)) --> S_LOAD["load_section_template"]
+        S_LOAD --> S_CHOOSE["choose_optional_sections<br/>可選章節時呼叫 LLM"]
+        S_CHOOSE --> S_ASSEMBLE["assemble_sections"]
+        S_ASSEMBLE --> S_END((END))
+    end
+
+    subgraph CONTENT_GRAPH
+        C_START((START)) --> C_LOAD["load_content_catalog"]
+        C_LOAD --> C_CHOOSE["choose_content_types<br/>LLM 選內容類型"]
+        C_CHOOSE --> C_VALIDATE["validate_content_plan"]
+        C_VALIDATE --> C_END((END))
+    end
+
+    subgraph GENERAL_OUTLINE_GRAPH
+        G_START((START)) --> G_LOAD["load_outline_context"]
+        G_LOAD --> G_DRAFT["draft_outline<br/>LLM 撰寫大綱"]
+        G_DRAFT --> G_VALIDATE["validate_outline"]
+        G_VALIDATE --> G_ASSEMBLE["assemble_outline"]
+        G_ASSEMBLE --> G_END((END))
+    end
+
+    S_END --> C_START
+    C_END --> G_START
+    G_END --> REPLAN_RESULT["回傳 GeneralReplanResponse"]
+
+    %% Capability execution returns tool results; it does not itself produce DOCX.
+    subgraph EXECUTION_GRAPH
+        E_START((START)) --> E_PREPARE["prepare_capability_tasks"]
+        E_PREPARE --> E_RAG["run_rag<br/>依 chatId 或 useSampleData 取資料"]
+        E_RAG --> E_OTHER["run_other_tools<br/>執行其他能力"]
+        E_OTHER --> E_COLLECT["collect_results"]
+        E_COLLECT --> E_END((END))
+    end
+
+    API_EXECUTE --> E_START
+    E_END --> EXECUTE_RESULT["回傳 GeneralExecutionResult"]
+
+    %% Thread DOCX uses only the current general-document flow.
+    API_THREAD_DOCX --> THREAD_SOURCE{"有通用大綱且 sourceMode 非 user_data？"}
+    THREAD_SOURCE -- 否 --> DRAFT_EXPORT["export_current_draft<br/>匯出規劃進度"]
+    THREAD_SOURCE -- 是 --> X_START
+
+    %% General DOCX content is selected by metadata confidence.
+    subgraph DOCX_CONTENT_GRAPH
+        X_START((START)) --> X_MATCH["match_metadata<br/>分類候選並由 LLM 比對 metadata"]
+        X_MATCH --> X_ROUTE{"sample_id？"}
+        X_ROUTE -->|主題相符且信心 ≥ 0.8| X_JSON["draft_from_json<br/>讀完整 JSON 並逐章撰寫"]
+        X_ROUTE -->|未命中或信心不足| X_OUTLINE["draft_from_outline<br/>一次 LLM 呼叫產出所有章節，不讀 JSON"]
+        X_JSON --> X_END((END))
+        X_OUTLINE --> X_END
+    end
+
+    X_END --> DOCX_EXPORT["export_current_draft<br/>寫入 DOCX"]
+

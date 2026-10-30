@@ -1,0 +1,578 @@
+[
+  {
+    "id": "D01",
+    "name": "授信審查報告",
+    "category": "金融",
+    "purpose": "評估企業財務、信用風險及授信條件",
+    "requiredSectionIds": [
+      "S01",
+      "S05",
+      "S08",
+      "S12",
+      "S19"
+    ],
+    "optionalSectionIds": [
+      "S06",
+      "S09",
+      "S10"
+    ]
+  },
+  {
+    "id": "D02",
+    "name": "財務分析報告",
+    "category": "金融",
+    "purpose": "分析財務結構、經營績效與財務健康度",
+    "requiredSectionIds": [
+      "S01",
+      "S06",
+      "S08",
+      "S09",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S10",
+      "S12",
+      "S19"
+    ]
+  },
+  {
+    "id": "D03",
+    "name": "市場研究報告",
+    "category": "商業研究",
+    "purpose": "研究市場規模、競爭環境及發展機會",
+    "requiredSectionIds": [
+      "S01",
+      "S02",
+      "S06",
+      "S07",
+      "S08",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S09",
+      "S10",
+      "S13"
+    ]
+  },
+  {
+    "id": "D04",
+    "name": "產業趨勢報告",
+    "category": "商業研究",
+    "purpose": "分析產業變化、技術演進及未來趨勢",
+    "requiredSectionIds": [
+      "S01",
+      "S02",
+      "S06",
+      "S09",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S08",
+      "S10",
+      "S13"
+    ]
+  },
+  {
+    "id": "D05",
+    "name": "競品分析報告",
+    "category": "商業研究",
+    "purpose": "比較不同企業或產品的競爭優劣勢",
+    "requiredSectionIds": [
+      "S03",
+      "S06",
+      "S10",
+      "S19",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S08",
+      "S09",
+      "S12"
+    ]
+  },
+  {
+    "id": "D06",
+    "name": "可行性評估報告",
+    "category": "專案管理",
+    "purpose": "評估專案、技術或商業方案的可行性",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S07",
+      "S12",
+      "S17",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S10",
+      "S19"
+    ]
+  },
+  {
+    "id": "D07",
+    "name": "專案企劃書",
+    "category": "專案管理",
+    "purpose": "說明專案目標、執行方案、資源與時程",
+    "requiredSectionIds": [
+      "S02",
+      "S03",
+      "S14",
+      "S16",
+      "S17"
+    ],
+    "optionalSectionIds": [
+      "S12",
+      "S15",
+      "S19"
+    ]
+  },
+  {
+    "id": "D08",
+    "name": "系統需求規格書（SRS）",
+    "category": "資訊技術",
+    "purpose": "定義系統功能、非功能及介接需求",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S14",
+      "S16"
+    ],
+    "optionalSectionIds": [
+      "S05",
+      "S15",
+      "S18"
+    ]
+  },
+  {
+    "id": "D09",
+    "name": "系統設計文件（SDD）",
+    "category": "資訊技術",
+    "purpose": "描述系統架構、元件、資料與技術設計",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S15",
+      "S16"
+    ],
+    "optionalSectionIds": [
+      "S12",
+      "S14",
+      "S18"
+    ]
+  },
+  {
+    "id": "D10",
+    "name": "操作教學手冊",
+    "category": "操作教學",
+    "purpose": "提供系統或產品操作指引",
+    "requiredSectionIds": [
+      "S02",
+      "S04",
+      "S16",
+      "S18"
+    ],
+    "optionalSectionIds": [
+      "S13",
+      "S15"
+    ]
+  },
+  {
+    "id": "D11",
+    "name": "標準作業程序（SOP）",
+    "category": "操作教學",
+    "purpose": "規範工作流程、責任分工及處理方式",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S16"
+    ],
+    "optionalSectionIds": [
+      "S12",
+      "S18"
+    ]
+  },
+  {
+    "id": "D12",
+    "name": "測試報告",
+    "category": "資訊技術",
+    "purpose": "彙整測試方法、結果、缺陷及品質結論",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S07",
+      "S18",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S08",
+      "S11",
+      "S19"
+    ]
+  },
+  {
+    "id": "D13",
+    "name": "風險評估報告",
+    "category": "風險管理",
+    "purpose": "識別、分析及評估各類風險",
+    "requiredSectionIds": [
+      "S05",
+      "S07",
+      "S12",
+      "S19",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S06",
+      "S08",
+      "S13"
+    ]
+  },
+  {
+    "id": "D14",
+    "name": "法律合約",
+    "category": "法律",
+    "purpose": "定義當事人權利、義務及法律責任",
+    "requiredSectionIds": [
+      "S04",
+      "S14",
+      "S16"
+    ],
+    "optionalSectionIds": [
+      "S12",
+      "S20"
+    ]
+  },
+  {
+    "id": "D15",
+    "name": "法律意見書",
+    "category": "法律",
+    "purpose": "分析法律問題、適用法規及法律風險",
+    "requiredSectionIds": [
+      "S02",
+      "S06",
+      "S12",
+      "S13",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S07",
+      "S19"
+    ]
+  },
+  {
+    "id": "D16",
+    "name": "學術研究報告",
+    "category": "研究教育",
+    "purpose": "呈現研究背景、方法、發現及結論",
+    "requiredSectionIds": [
+      "S02",
+      "S03",
+      "S06",
+      "S07",
+      "S18",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S08",
+      "S10",
+      "S13"
+    ]
+  },
+  {
+    "id": "D17",
+    "name": "文章賞析",
+    "category": "研究教育",
+    "purpose": "分析文章主題、寫作技巧與文學價值",
+    "requiredSectionIds": [
+      "S02",
+      "S05",
+      "S13",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S06",
+      "S07",
+      "S10"
+    ]
+  },
+  {
+    "id": "D18",
+    "name": "教材／課程講義",
+    "category": "研究教育",
+    "purpose": "系統性介紹知識、觀念及練習內容",
+    "requiredSectionIds": [
+      "S02",
+      "S03",
+      "S13",
+      "S16",
+      "S18"
+    ],
+    "optionalSectionIds": [
+      "S06",
+      "S15"
+    ]
+  },
+  {
+    "id": "D19",
+    "name": "事件調查報告",
+    "category": "風險管理",
+    "purpose": "還原事件經過、分析原因並提出改善措施",
+    "requiredSectionIds": [
+      "S02",
+      "S05",
+      "S06",
+      "S11",
+      "S19",
+      "S20"
+    ],
+    "optionalSectionIds": [
+      "S12",
+      "S13"
+    ]
+  },
+  {
+    "id": "D20",
+    "name": "決策建議報告",
+    "category": "商業研究",
+    "purpose": "比較方案並提供決策依據與建議",
+    "requiredSectionIds": [
+      "S01",
+      "S05",
+      "S10",
+      "S12",
+      "S19"
+    ],
+    "optionalSectionIds": [
+      "S08",
+      "S17",
+      "S20"
+    ]
+  },
+  {
+    "id": "D21",
+    "name": "美食食譜",
+    "category": "日常生活",
+    "purpose": "提供料理方法、食材份量與烹飪技巧",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S16"
+    ],
+    "optionalSectionIds": [
+      "S02",
+      "S19"
+    ],
+    "suggestedSections": [
+      "食材準備",
+      "料理步驟",
+      "烹飪技巧",
+      "營養資訊"
+    ]
+  },
+  {
+    "id": "D22",
+    "name": "旅遊規劃建議書",
+    "category": "日常生活",
+    "purpose": "根據預算、天數及喜好規劃旅遊行程",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S16",
+      "S17"
+    ],
+    "optionalSectionIds": [
+      "S02",
+      "S10",
+      "S12"
+    ],
+    "suggestedSections": [
+      "目的地介紹",
+      "景點推薦",
+      "每日行程",
+      "交通住宿",
+      "費用預估"
+    ]
+  },
+  {
+    "id": "D23",
+    "name": "健身訓練計畫",
+    "category": "日常生活",
+    "purpose": "根據目標與體能狀況安排運動內容",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S16",
+      "S18"
+    ],
+    "optionalSectionIds": [
+      "S05",
+      "S12",
+      "S19"
+    ],
+    "suggestedSections": [
+      "健身目標",
+      "訓練菜單",
+      "動作教學",
+      "進度追蹤"
+    ]
+  },
+  {
+    "id": "D24",
+    "name": "飲食營養規劃",
+    "category": "日常生活",
+    "purpose": "根據飲食需求提供餐點與營養建議",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S16"
+    ],
+    "optionalSectionIds": [
+      "S05",
+      "S08",
+      "S19"
+    ],
+    "suggestedSections": [
+      "營養需求",
+      "每日菜單",
+      "熱量分析",
+      "飲食建議"
+    ]
+  },
+  {
+    "id": "D25",
+    "name": "商品選購指南",
+    "category": "日常生活",
+    "purpose": "比較產品功能、規格、價格與適用情境",
+    "requiredSectionIds": [
+      "S03",
+      "S10",
+      "S19"
+    ],
+    "optionalSectionIds": [
+      "S06",
+      "S12",
+      "S17"
+    ],
+    "suggestedSections": [
+      "購買需求",
+      "商品比較",
+      "優缺點分析",
+      "購買建議"
+    ]
+  },
+  {
+    "id": "D26",
+    "name": "生活理財規劃",
+    "category": "日常生活",
+    "purpose": "協助管理收入、支出、儲蓄及財務目標",
+    "requiredSectionIds": [
+      "S03",
+      "S05",
+      "S08",
+      "S19"
+    ],
+    "optionalSectionIds": [
+      "S09",
+      "S12",
+      "S17"
+    ],
+    "suggestedSections": [
+      "收支分析",
+      "預算分配",
+      "儲蓄目標",
+      "改善建議"
+    ]
+  },
+  {
+    "id": "D27",
+    "name": "活動企劃書",
+    "category": "日常生活",
+    "purpose": "規劃聚會、生日派對、婚禮或其他活動",
+    "requiredSectionIds": [
+      "S03",
+      "S04",
+      "S16",
+      "S17"
+    ],
+    "optionalSectionIds": [
+      "S12",
+      "S19"
+    ],
+    "suggestedSections": [
+      "活動主題",
+      "流程安排",
+      "場地選擇",
+      "預算",
+      "人員分工"
+    ]
+  },
+  {
+    "id": "D28",
+    "name": "學習計畫書",
+    "category": "日常生活",
+    "purpose": "根據學習目標、程度與時間安排學習路線",
+    "requiredSectionIds": [
+      "S03",
+      "S05",
+      "S16",
+      "S18"
+    ],
+    "optionalSectionIds": [
+      "S13",
+      "S19"
+    ],
+    "suggestedSections": [
+      "學習目標",
+      "課程安排",
+      "學習資源",
+      "練習題",
+      "成果評估"
+    ]
+  },
+  {
+    "id": "D29",
+    "name": "居家生活改善計畫",
+    "category": "日常生活",
+    "purpose": "提供居家整理、空間配置及生活環境優化建議",
+    "requiredSectionIds": [
+      "S05",
+      "S15",
+      "S17",
+      "S19"
+    ],
+    "optionalSectionIds": [
+      "S03",
+      "S10",
+      "S16"
+    ],
+    "suggestedSections": [
+      "現況分析",
+      "空間規劃",
+      "改善方案",
+      "用品清單",
+      "預算"
+    ]
+  },
+  {
+    "id": "D30",
+    "name": "娛樂推薦指南",
+    "category": "日常生活",
+    "purpose": "根據個人喜好推薦電影、遊戲、書籍或休閒活動",
+    "requiredSectionIds": [
+      "S03",
+      "S10",
+      "S19"
+    ],
+    "optionalSectionIds": [
+      "S02",
+      "S06",
+      "S13"
+    ],
+    "suggestedSections": [
+      "興趣分析",
+      "作品介紹",
+      "特色比較",
+      "推薦清單"
+    ]
+  }
+]

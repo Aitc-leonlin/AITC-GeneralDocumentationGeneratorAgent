@@ -1,0 +1,110 @@
+flowchart TD
+    %% Semantic question processing with Neo4j workflow decisions.
+
+    U([使用者問題]) --> API[POST /api/chatbot]
+    API -. 診斷用，不影響回答 .-> DIAG[查詢 Company 一階關聯並輸出 Log]
+    API --> REPHRASE[rephrase_question<br/>結合對話歷史重寫問題]
+    REPHRASE --> RANGE[classify_is_question_in_range]
+    RANGE --> QTYPE[classify_question_type]
+
+    QTYPE -->|EXACT_QUERY| STMT[classify_statement_type]
+    STMT --> EXACT[exact_query<br/>SQL 精確財報查詢]
+    EXACT --> EXACT_ANSWER([回傳精確數值答案])
+
+    QTYPE -->|SEMANTIC / ANALYSIS / DECISION| CATALOG[從 Neo4j 讀取<br/>SemanticWorkflow 目錄]
+    CATALOG --> CLASSIFY[classify_semantic_workflow<br/>LLM 選擇 14 種工作流之一]
+    CLASSIFY --> CONF{分類信心 ≥ 0.55<br/>且不是 OTHER?}
+    CONF -->|否| FALLBACK[deep_agent_fallback]
+    FALLBACK --> FALLBACK_ANSWER([回傳 Fallback 答案])
+
+    CONF -->|是| WORKFLOW[從 Neo4j 載入選定工作流]
+    WORKFLOW -->|HAS_PURPOSE| PURPOSE[WorkflowGuidance<br/>分析目的]
+    WORKFLOW -->|REQUIRES_FINANCIAL_DATA| DATA_REQ[WorkflowGuidance<br/>財務資料需求]
+    WORKFLOW -->|USES_RAG_FOCUS| RAG[WorkflowGuidance<br/>RAG 重點]
+    WORKFLOW -->|HAS_ANALYSIS_STEP| STEPS[WorkflowGuidance<br/>分析步驟]
+    WORKFLOW -->|HAS_OUTPUT_REQUIREMENT| OUTPUT_REQ[WorkflowGuidance<br/>輸出規則]
+    WORKFLOW -->|TRIGGERS order| ACTIONS[AgentAction<br/>後續允許／要求的行為]
+
+    PURPOSE --> PLAN[extract_semantic_plan_node]
+    DATA_REQ --> PLAN
+    RAG --> PLAN
+    STEPS --> PLAN
+    OUTPUT_REQ --> PLAN
+    ACTIONS --> PLAN
+    PLAN --> PLAN_JSON[Semantic Plan<br/>公司、分析目標、欄位、期間、purpose]
+
+    PLAN_JSON --> KG_NODE[retrieve_semantic_knowledge_graph]
+    ACTIONS --> KG_NODE
+    KG_NODE --> COMPANY_ACTION{包含<br/>RESOLVE_COMPANY?}
+
+    COMPANY_ACTION -->|是| RESOLVE[解析公司代碼／名稱]
+    RESOLVE --> COMPANY_FOUND{找到 Company?}
+    COMPANY_FOUND -->|否| COMPANY_MISSING([要求補充公司名稱])
+    COMPANY_FOUND -->|是| COMPANY_GRAPH[查詢公司知識子圖]
+    COMPANY_GRAPH --> REPORTS[Company - FILED → Report<br/>可用報表與期間]
+    COMPANY_GRAPH --> EXPERT_GRAPH[Company - HAS_EXPERT_KNOWLEDGE<br/>→ ExpertKnowledge]
+    COMPANY_GRAPH --> WAREHOUSE_GRAPH[Company - HAS_WAREHOUSE_KNOWLEDGE<br/>→ WarehouseKnowledge]
+
+    COMPANY_ACTION -->|否| CONCEPT_ACTION{包含<br/>RETRIEVE_FINANCIAL_CONCEPTS?}
+    CONCEPT_ACTION -->|是| CONCEPT_GRAPH[FinancialField - MAPS_TO → Concept<br/>查欄位定義與 XBRL 概念]
+    CONCEPT_ACTION -->|否| KG_READY[完成知識圖譜 Context]
+    REPORTS --> KG_READY
+    EXPERT_GRAPH --> KG_READY
+    WAREHOUSE_GRAPH --> KG_READY
+    CONCEPT_GRAPH --> KG_READY
+
+    KG_READY --> EXTERNAL_GATE{前端 useExternalData=true<br/>且 Action 包含<br/>CONSIDER_EXTERNAL_DATA?}
+    EXTERNAL_GATE -->|是| EXTERNAL_JUDGE[use_external_data<br/>LLM 判斷是否需要外查]
+    EXTERNAL_JUDGE --> NEED_EXTERNAL{需要外部資料?}
+    NEED_EXTERNAL -->|是| HITL[review_external_data<br/>Interrupt 等待人工確認]
+    HITL --> ADOPTED{採用查詢?}
+    ADOPTED -->|是| EXTERNAL_QUERY[query_approved_external_data]
+    ADOPTED -->|否| EXPERT_SELECT
+    EXTERNAL_QUERY --> EXPERT_SELECT
+    NEED_EXTERNAL -->|否| EXPERT_SELECT
+    EXTERNAL_GATE -->|否| EXPERT_SELECT[select_applied_expert_knowledge]
+
+    EXPERT_SELECT --> EXPERT_GATE{設定允許且 Action 包含<br/>RETRIEVE_EXPERT_KNOWLEDGE?}
+    EXPERT_GATE -->|是| EXPERT_LLM[LLM 依 anchorDescription<br/>篩選相關專家知識]
+    EXPERT_GATE -->|否| WAREHOUSE_SELECT
+    EXPERT_LLM --> WAREHOUSE_SELECT[select_applied_warehouse_data]
+
+    WAREHOUSE_SELECT --> WAREHOUSE_GATE{設定允許且 Action 包含<br/>RETRIEVE_WAREHOUSE_KNOWLEDGE?}
+    WAREHOUSE_GATE -->|是| WAREHOUSE_MERGE[合併前端與 Neo4j 倉儲資料<br/>並去重]
+    WAREHOUSE_GATE -->|否| SEMANTIC_RETRIEVAL
+    WAREHOUSE_MERGE --> SEMANTIC_RETRIEVAL[semantic_retrieval]
+
+    SEMANTIC_RETRIEVAL --> FINANCIAL_GATE{有 Company 且 Action 包含<br/>RETRIEVE_FINANCIAL_FACTS?}
+    FINANCIAL_GATE -->|是| SQL_FACTS[(SQL Source of Truth<br/>查正式財報數值)]
+    FINANCIAL_GATE -->|否| EVIDENCE
+    SQL_FACTS --> EVIDENCE[組合回答證據]
+
+    EVIDENCE --> ENOUGH{至少有一種可用證據?}
+    ENOUGH -->|否| INSUFFICIENT([資料不足回覆])
+    ENOUGH -->|是| FINAL_LLM[最終 LLM Prompt]
+
+    FINAL_LLM --> FACT_SOURCE[SQL facts / computed_metrics<br/>公司財務數字]
+    FINAL_LLM --> CONCEPT_SOURCE[Neo4j FinancialField / Concept<br/>一般財務概念]
+    FINAL_LLM --> CONTEXT_SOURCE[Expert / Warehouse / External<br/>風險與背景資料]
+    FACT_SOURCE --> FINAL_ANSWER([繁體中文分析回答])
+    CONCEPT_SOURCE --> FINAL_ANSWER
+    CONTEXT_SOURCE --> FINAL_ANSWER
+
+    NEO4J_DOWN[(Neo4j 無法連線)] -.-> PY_FALLBACK[Python Workflow Template Fallback]
+    PY_FALLBACK -.-> PLAN
+
+    classDef user fill:#0f766e,color:#fff,stroke:#115e59,stroke-width:2px;
+    classDef neo4j fill:#1e40af,color:#fff,stroke:#1e3a8a,stroke-width:2px;
+    classDef llm fill:#7c3aed,color:#fff,stroke:#5b21b6,stroke-width:2px;
+    classDef database fill:#b45309,color:#fff,stroke:#92400e,stroke-width:2px;
+    classDef decision fill:#fef3c7,color:#78350f,stroke:#d97706,stroke-width:2px;
+    classDef terminal fill:#166534,color:#fff,stroke:#14532d,stroke-width:2px;
+    classDef fallback fill:#6b7280,color:#fff,stroke:#374151,stroke-width:2px;
+
+    class U user;
+    class CATALOG,WORKFLOW,KG_NODE,COMPANY_GRAPH,REPORTS,EXPERT_GRAPH,WAREHOUSE_GRAPH,CONCEPT_GRAPH,CONCEPT_SOURCE neo4j;
+    class REPHRASE,RANGE,QTYPE,CLASSIFY,PLAN,EXTERNAL_JUDGE,EXPERT_LLM,FINAL_LLM llm;
+    class EXACT,SQL_FACTS,FACT_SOURCE database;
+    class CONF,COMPANY_ACTION,COMPANY_FOUND,CONCEPT_ACTION,EXTERNAL_GATE,NEED_EXTERNAL,ADOPTED,EXPERT_GATE,WAREHOUSE_GATE,FINANCIAL_GATE,ENOUGH decision;
+    class EXACT_ANSWER,FALLBACK_ANSWER,COMPANY_MISSING,INSUFFICIENT,FINAL_ANSWER terminal;
+    class FALLBACK,NEO4J_DOWN,PY_FALLBACK fallback;
