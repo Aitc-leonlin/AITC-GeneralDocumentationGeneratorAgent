@@ -141,6 +141,7 @@ DEFAULT_CORS_ALLOW_ORIGINS = [
     "https://aitc-credit-investigation-chat-bot.vercel.app",
     "https://aitc-credit-investigation-chat-bot-web-ashqnxvdk.vercel.app",
     "https://aitc-creditinvestigationchatbotwebui.onrender.com",
+    "https://aitc-g63d.onrender.com",
 ]
 
 
