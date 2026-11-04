@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local diagrams and generated XBRL data
+*.mmd
+/src/features/chatbot/services/xbrl_dictionary_splits/
+/src/features/chatbot/services/xbrl_mapping/
