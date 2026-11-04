@@ -30,15 +30,6 @@ class ReportThreadFinalizeCommand(BaseModel):
     confirmed: Literal[True]
 
 
-class GeneralThreadExecuteCommand(BaseModel):
-    confirmed: Literal[True]
-    chatId: str | None = None
-    useSampleData: bool = False
-    sectionId: str | None = Field(default=None, pattern=r"^(?:S(?:0[1-9]|1[0-9]|20)|section-[1-9][0-9]*)$")
-    contentTypeId: str | None = Field(default=None, pattern=r"^C(?:0[1-9]|1[0-9]|20)$")
-    capability: str | None = None
-
-
 class ReportThreadConflict(Exception):
     """Another request changed the thread while its next outline was being drafted."""
 

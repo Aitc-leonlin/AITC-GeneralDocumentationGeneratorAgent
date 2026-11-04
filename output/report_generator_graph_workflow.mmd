@@ -11,10 +11,7 @@ flowchart TD
     NEED -- "是" --> CLARIFY["clarify<br/>回傳一個具體問題"]
     NEED -- "否" --> SOURCE["resolve_source_mode<br/>決定資料來源"]
 
-    SOURCE --> SAMPLE{"選用測試 JSON？"}
-    SAMPLE -- "是" --> LOAD_SAMPLE["load_sample_json<br/>讀取對應的虛構案例"]
-    SAMPLE -- "否" --> PLAN["plan_purpose_document<br/>依用途規劃章節與大綱"]
-    LOAD_SAMPLE --> PLAN
+    SOURCE --> PLAN["plan_purpose_document<br/>依用途規劃章節與大綱"]
 
     ANSWER --> RESPONSE["回傳本次回答"]
     CLARIFY --> RESPONSE
@@ -22,8 +19,15 @@ flowchart TD
     RESPONSE --> THREAD["Thread 保存對話與目前規劃"]
     RESPONSE --> TRACE["前端 localStorage<br/>記錄最新回答的 Graph Nodes"]
 
-    THREAD -- "另外呼叫 execute-general" --> EXEC["執行已接入的內容工具<br/>結果只回傳"]
-    THREAD -- "另外呼叫 generate" --> DOCX["下載目前版本 DOCX"]
+    THREAD -- "確認後呼叫 generate" --> EXPORT{"有大綱且來源模式非 user_data？"}
+    EXPORT -- "否" --> PROGRESS["匯出目前規劃與待補內容"]
+    EXPORT -- "是" --> MATCH["比對測試案例 metadata"]
+    MATCH --> MATCHED{"案例相符且信心達 0.8？"}
+    MATCHED -- "是" --> JSON["讀取測試 JSON 並逐章撰寫"]
+    MATCHED -- "否" --> LLM["依大綱由 LLM 撰寫章節"]
+    PROGRESS --> TRACE["文件末尾附上 LLM REQUEST／PROMPT／RESPONSE"]
+    JSON --> TRACE
+    LLM --> TRACE
+    TRACE --> DOCX["下載目前版本 DOCX"]
 
-    %% /draft 使用相同的對話 Graph，但不保存 Thread。
-    %% 既存固定格式資料的相容下載及單一 Document Type 的 /replan 入口未列入此主流程圖。
+    %% 既存固定格式資料的相容下載未列入此主流程圖。

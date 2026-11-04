@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from .schemas import (
-    ContentTypeTemplate, DocumentSectionPlan, DocumentTypeTemplate,
+    ContentTypeTemplate, DocumentTypeTemplate,
     ReportQuickStart, ReportQuickStartDefinition, SectionTypeTemplate,
 )
 
@@ -62,19 +62,6 @@ def load_document_type_templates() -> dict[str, DocumentTypeTemplate]:
         ):
             raise ValueError(f"{template.id} 的必要或可選章節 ID 不正確")
     return {item.id: item for item in templates}
-
-
-def get_document_section_plan(document_type_id: str) -> DocumentSectionPlan | None:
-    """依 D ID 取得有順序的必要／可選章節及其建議內容種類。"""
-    template = load_document_type_templates().get(document_type_id)
-    if template is None:
-        return None
-    sections = load_section_type_templates()
-    return DocumentSectionPlan(
-        documentTemplate=template,
-        requiredSections=[sections[section_id] for section_id in template.requiredSectionIds],
-        optionalSections=[sections[section_id] for section_id in template.optionalSectionIds],
-    )
 
 
 def _load_quick_start_definitions() -> list[ReportQuickStartDefinition]:

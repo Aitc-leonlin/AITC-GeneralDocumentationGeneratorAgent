@@ -42,12 +42,6 @@ class SectionTypeTemplate(BaseModel):
     commonDocuments: list[str] = Field(min_length=1)
 
 
-class DocumentSectionPlan(BaseModel):
-    documentTemplate: DocumentTypeTemplate
-    requiredSections: list[SectionTypeTemplate]
-    optionalSections: list[SectionTypeTemplate]
-
-
 class PlannedSection(BaseModel):
     sectionId: str = Field(pattern=r"^S(?:0[1-9]|1[0-9]|20)$")
     isRequired: bool
@@ -125,20 +119,6 @@ class PendingClarification(BaseModel):
     question: str = Field(min_length=1, max_length=1000)
     missingDecision: str = Field(min_length=1, max_length=300)
     purposes: list[DocumentPurpose] = Field(default_factory=list)
-
-
-class GeneralReplanRequest(BaseModel):
-    documentTypeId: str = Field(pattern=r"^D(?:0[1-9]|[12][0-9]|30)$")
-    messages: list[ReportChatMessage] = Field(min_length=1, max_length=30)
-    startAt: Literal["sections", "contents", "outline"]
-    currentPlan: GeneralDocumentPlan | None = None
-    currentOutline: GeneralDocumentOutline | None = None
-
-
-class GeneralReplanResponse(BaseModel):
-    plan: GeneralDocumentPlan
-    outline: GeneralDocumentOutline
-    llmTraces: list[ReportLLMTrace] = Field(default_factory=list)
 
 
 class ReportOutlineRequest(BaseModel):

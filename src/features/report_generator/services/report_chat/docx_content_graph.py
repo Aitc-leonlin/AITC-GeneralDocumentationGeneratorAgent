@@ -1,15 +1,19 @@
 """DOCX 內容來源分流：metadata 命中讀 JSON，否則依大綱由 LLM 撰寫。"""
 
 import json
-from typing import Literal, TypedDict
+import os
+from typing import Callable, Literal, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
+
+from src.features.report_generator.services.domain_report_service import ReportLLMTrace
 
 from .json_evidence import (
     JsonEvidence, SectionAnswer, draft_sections_from_json, retrieve_json_evidence,
 )
 from .llm import _invoke_report_structured
+from .markdown_tables import TABLE_FORMAT_FEW_SHOT
 from .sample_matcher import match_document_type_sample
 from .schemas import GeneralDocumentOutline, PurposeDocumentOutline, ReportChatMessage
 
@@ -31,13 +35,21 @@ class DocxContentState(TypedDict, total=False):
     mode: Literal["json", "outline_llm"]
     evidence: JsonEvidence | None
     answers: list[SectionAnswer]
+    traces: list[ReportLLMTrace]
+    progress_callback: Callable[[int, str], None] | None
 
 
 def _match_metadata(state: DocxContentState) -> DocxContentState:
+    traces = list(state.get("traces", []))
+    callback = state.get("progress_callback")
+    if callback:
+        callback(15, "比對測試案例與報告大綱")
     sample_id = match_document_type_sample(
-        state["outline"], state.get("classified_document_type_id")
+        state["outline"], state.get("classified_document_type_id"), traces=traces,
     )
-    return {"sample_id": sample_id}
+    if callback:
+        callback(20, "完成測試案例比對")
+    return {"sample_id": sample_id, "traces": traces}
 
 
 def _route_content(state: DocxContentState) -> Literal["json", "outline_llm"]:
@@ -49,12 +61,16 @@ def _draft_from_json(state: DocxContentState) -> DocxContentState:
     if not sample_id:
         raise RuntimeError("metadata 比對未選出 JSON 案例")
     evidence = retrieve_json_evidence(sample_id)
+    traces = list(state.get("traces", []))
+    callback = state.get("progress_callback")
     return {
         "mode": "json",
         "evidence": evidence,
         "answers": draft_sections_from_json(
-            state["outline"], evidence, state["messages"]
+            state["outline"], evidence, state["messages"], traces=traces,
+            progress_callback=callback,
         ),
+        "traces": traces,
     }
 
 
@@ -84,11 +100,24 @@ def _draft_from_outline(state: DocxContentState) -> DocxContentState:
     user_requests = [
         message.content for message in state["messages"] if message.role == "user"
     ]
+    traces = list(state.get("traces", []))
+    callback = state.get("progress_callback")
+    if callback:
+        callback(25, "依大綱撰寫報告章節")
+    if os.getenv("LLM_PROVIDER", "openai").strip().lower() == "local":
+        table_instruction = (
+            "不要產生 Markdown 表格或其他表格格式；即使大綱列出比較矩陣或數據表格，"
+            "也請改用一般段落或條列清單逐項說明。"
+        )
+        table_example = ""
+    else:
+        table_instruction = "如需表格，使用完整 Markdown 表格，放在同一個 paragraphs 項目內。"
+        table_example = f"{TABLE_FORMAT_FEW_SHOT}\n"
     draft = _invoke_report_structured(
         model=chat_model,
         schema=OutlineDocumentDraft,
         operation="general_document.draft_from_outline",
-        traces=[],
+        traces=traces,
         prompt=(
             "你是繁體中文 DOCX 文件撰稿者。預設測試案例的 metadata 與這份大綱"
             "沒有足夠關聯；請只根據下列大綱、使用者明確需求與通用知識撰寫各章內文。"
@@ -98,9 +127,10 @@ def _draft_from_outline(state: DocxContentState) -> DocxContentState:
             "若缺少特定數據或個案資料，改寫成適用的說明、操作方法、判斷準則或"
             "可執行的建議；不得捏造數值、已發生的事實、檢驗結果、引文、法規條文"
             "或已查閱的來源。必要時明確說明內容為一般性建議或示例。"
-            "如需表格，使用完整 Markdown 表格，放在同一個 paragraphs 項目內。"
+            f"{table_instruction}"
             "sections 必須依大綱順序，每章恰好一筆；sectionIndex 必須等於大綱序號。"
             "每章提供 1 至 4 段可直接呈現的文字，不要包在程式碼區塊中。\n"
+            f"{table_example}"
             f"大綱：{json.dumps(outline_input, ensure_ascii=False)}\n"
             f"使用者需求：{json.dumps(user_requests[-15:], ensure_ascii=False)}"
         ),
@@ -113,13 +143,18 @@ def _draft_from_outline(state: DocxContentState) -> DocxContentState:
         for section in draft.sections for paragraph in section.paragraphs
     ):
         raise RuntimeError("LLM 回傳了空白或待補內容，無法產生完整 DOCX")
+    if callback:
+        callback(70, "整理章節內容")
+    answers: list[SectionAnswer] = []
+    for section_draft in draft.sections:
+        answers.append(SectionAnswer(paragraphs=section_draft.paragraphs))
+        if callback:
+            callback(70 + 10 * len(answers) // len(draft.sections), f"已整理 {len(answers)}/{len(draft.sections)} 個章節")
     return {
         "mode": "outline_llm",
         "evidence": None,
-        "answers": [
-            SectionAnswer(paragraphs=section.paragraphs)
-            for section in draft.sections
-        ],
+        "traces": traces,
+        "answers": answers,
     }
 
 
@@ -141,9 +176,13 @@ def build_docx_content(
     outline: GeneralDocumentOutline | PurposeDocumentOutline,
     messages: list[ReportChatMessage],
     classified_document_type_id: str | None,
+    *,
+    progress_callback: Callable[[int, str], None] | None = None,
 ) -> DocxContentState:
     return DOCX_CONTENT_GRAPH.invoke({
         "outline": outline,
         "messages": messages,
         "classified_document_type_id": classified_document_type_id,
+        "traces": [],
+        "progress_callback": progress_callback,
     })

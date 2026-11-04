@@ -2,13 +2,18 @@
 
 from datetime import datetime
 from io import BytesIO
+from typing import Callable
 from zoneinfo import ZoneInfo
 
 from docx import Document
 from docx.document import Document as DocxDocument
 from docx.shared import Cm, Pt
 
-from src.features.report_generator.services.domain_report_service import _render_markdown_body
+from src.features.report_generator.services.domain_report_service import (
+    ReportLLMTrace,
+    _render_markdown_body,
+    # llm_trace_blocks,  # 恢復 DOCX LLM 呼叫紀錄時再啟用
+)
 
 from .catalog import (
     load_content_type_templates,
@@ -17,6 +22,7 @@ from .catalog import (
 )
 from .docx_content_graph import build_docx_content
 from .json_evidence import JsonEvidence
+from .markdown_tables import omit_unrenderable_markdown_tables
 from .schemas import (
     GeneralDocumentOutline, GeneralDocumentPlan, PurposeDocumentOutline,
     PurposeDocumentPlan, ReportChatMessage,
@@ -24,34 +30,38 @@ from .schemas import (
 
 
 def _add_readable_evidence(document: DocxDocument, evidence: JsonEvidence, evidence_ids: list[str]) -> None:
-    """Show the cited JSON fields as source descriptions, never internal IDs."""
+    """Show cited context and source notes beside a section; list facts once below."""
     labels = {
         "context": "案例情境",
-        "facts": "案例事實",
-        "sourceMaterials": "模擬來源描述",
+        "sourceMaterials": "來源描述",
         "assumptions": "案例假設",
     }
     selected = set(evidence_ids)
-    document.add_paragraph("本章參考的虛構資料：")
-    for item in evidence.items:
-        if item.id in selected:
-            label = labels[item.field.split("[", 1)[0]]
-            document.add_paragraph(f"{label}：{item.text}", style="List Bullet")
+    items = [
+        item for item in evidence.items
+        if item.id in selected and item.field.split("[", 1)[0] != "facts"
+    ]
+    if not items:
+        return
+    document.add_paragraph("本章參考的資料：")
+    for item in items:
+        label = labels[item.field.split("[", 1)[0]]
+        document.add_paragraph(f"{label}：{item.text}", style="List Bullet")
 
 
 def _add_generated_content(document: DocxDocument, paragraphs: list[str]) -> None:
-    """Render AI Markdown as Word paragraphs and tables, including split table rows."""
-    blocks: list[str] = []
-    for paragraph in paragraphs:
-        content = paragraph.strip()
-        if not content:
-            continue
-        if blocks and content.startswith("|") and blocks[-1].rstrip().endswith("|"):
-            blocks[-1] += "\n" + content
-        else:
-            blocks.append(content)
-    if blocks:
-        _render_markdown_body(document, "\n\n".join(blocks))
+    """Render prose and valid Word tables, omitting malformed Markdown tables."""
+    markdown = omit_unrenderable_markdown_tables(paragraphs)
+    if markdown:
+        _render_markdown_body(document, markdown)
+
+
+def _latest_conversation_traces(traces: list[ReportLLMTrace]) -> list[ReportLLMTrace]:
+    """只保留最近一輪報告對話的 LLM 呼叫紀錄。"""
+    for index in range(len(traces) - 1, -1, -1):
+        if traces[index].stage.startswith("report_outline.classify_question（第 1 次）"):
+            return traces[index:]
+    return []
 
 
 def export_current_draft(
@@ -60,14 +70,18 @@ def export_current_draft(
     plan: GeneralDocumentPlan | None,
     outline: GeneralDocumentOutline | None,
     messages: list[ReportChatMessage],
+    llm_traces: list[ReportLLMTrace] | None = None,
     use_sample_data: bool = False,
     purpose_plan: PurposeDocumentPlan | None = None,
     purpose_outline: PurposeDocumentOutline | None = None,
+    progress_callback: Callable[[int, str], None] | None = None,
 ) -> tuple[bytes, str]:
     """有大綱時依相關 JSON 或 LLM 撰寫；尚無大綱時匯出規劃進度。"""
     user_requests = [message.content for message in messages if message.role == "user"]
     if not user_requests:
         raise ValueError("請先描述文件需求，再下載目前版本")
+    if progress_callback:
+        progress_callback(5, "讀取文件規劃")
 
     document_types = load_document_type_templates()
     section_types = load_section_type_templates()
@@ -84,10 +98,17 @@ def export_current_draft(
     )
     template = document_types.get(type_id) if type_id else None
     active_outline = purpose_outline or outline
+    if progress_callback:
+        progress_callback(10, "準備報告內容")
     generated = (
-        build_docx_content(active_outline, messages, document_type_id)
+        build_docx_content(
+            active_outline, messages, document_type_id,
+            progress_callback=progress_callback,
+        )
         if use_sample_data and active_outline else None
     )
+    if progress_callback:
+        progress_callback(84, "編排 Word 文件")
     evidence = generated.get("evidence") if generated else None
     sample = evidence.sample if evidence else None
     answers = generated["answers"] if generated else None
@@ -203,20 +224,40 @@ def export_current_draft(
     if sample:
         document.add_paragraph(sample.sourceNote)
         document.add_paragraph("案例情境：" + sample.context, style="List Bullet")
+        if sample.facts:
+            document.add_paragraph("案例事實：")
+            for fact in sample.facts:
+                document.add_paragraph(f"{fact.label}：{fact.value}", style="List Bullet")
         for source in sample.sourceMaterials:
             document.add_paragraph(f"模擬來源描述：{source.title}：{source.content}", style="List Bullet")
         for assumption in sample.assumptions:
             document.add_paragraph(f"案例假設：{assumption}", style="List Bullet")
     document.add_paragraph(
         "本文件依目前對話與已完成的大綱規劃匯出；"
-        + ("章節中的案例事實來自虛構測試 JSON；" if sample else "")
+        + ("章節中的案例事實來自JSON資料；" if sample else "")
         + "未經資料查證的內容不作為事實或結論。"
     )
     document.add_heading("使用者於此聊天視窗提過的報告需求", level=1)
     for request in user_requests:
         document.add_paragraph(request, style="List Bullet")
 
+    # 暫時不將 LLM REQUEST、PROMPT 與 RESPONSE 內容附加到 DOCX。
+    # all_traces = [
+    #     *_latest_conversation_traces(llm_traces or []),
+    #     *(generated.get("traces", []) if generated else []),
+    # ]
+    # if all_traces:
+    #     document.add_page_break()
+    #     document.add_heading("最近一輪對話與本次匯出的 LLM API 呼叫紀錄", level=1)
+    #     for block in llm_trace_blocks(all_traces):
+    #         document.add_heading(block.title, level=2)
+    #         run = document.add_paragraph().add_run(block.content)
+    #         run.font.name = "Consolas"
+    #         run.font.size = Pt(8)
+
     stream = BytesIO()
     document.save(stream)
+    if progress_callback:
+        progress_callback(95, "完成 Word 文件，準備下載")
     safe_type_id = type_id if type_id in document_types else "general"
     return stream.getvalue(), f"{safe_type_id}_current_draft.docx"

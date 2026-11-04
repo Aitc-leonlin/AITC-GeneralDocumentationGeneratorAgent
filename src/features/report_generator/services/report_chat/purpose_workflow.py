@@ -238,7 +238,7 @@ def _draft_unified_outline(state: PurposeWorkflowState) -> PurposeWorkflowState:
             "使用者未提供的對象、期間填待提供。"
             "sourcePlan 要說明：若來源模式為 user_data，只使用使用者資料；"
             "其他情況在 DOCX 匯出時才用大綱和候選案例 metadata 比對，"
-            "只有具體主題相關且達信心門檻才引用虛構測試 JSON，否則標示待補。"
+            "只有具體主題相關且達信心門檻才引用測試 JSON，否則標示待補。"
             "延續目前大綱中未被最新訊息更改的要求。\n"
             f"統一計畫：{plan.model_dump_json()}\n"
             f"目前大綱：{state['current_outline'].model_dump_json() if state.get('current_outline') else 'null'}\n"

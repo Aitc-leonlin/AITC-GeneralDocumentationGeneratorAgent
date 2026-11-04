@@ -5,6 +5,8 @@ import logging
 
 from pydantic import BaseModel, Field
 
+from src.features.report_generator.services.domain_report_service import ReportLLMTrace
+
 from .catalog import load_document_type_templates
 from .llm import _invoke_report_structured
 from .samples import load_document_type_sample_metadata
@@ -56,8 +58,12 @@ def _candidate_ids(
 def match_document_type_sample(
     outline: GeneralDocumentOutline | PurposeDocumentOutline,
     classified_document_type_id: str | None = None,
+    *,
+    traces: list[ReportLLMTrace] | None = None,
 ) -> str | None:
     """回傳最相關且達門檻的案例 ID；無法確認時不使用虛構資料。"""
+    if traces is None:
+        traces = []
     outline_summary = {
         "title": outline.title,
         "subject": outline.subject,
@@ -79,7 +85,7 @@ def match_document_type_sample(
             model=chat_model,
             schema=MetadataMatchResult,
             operation="general_document.match_sample_metadata",
-            traces=[],
+            traces=traces,
             prompt=(
                 "你是文件來源 metadata 比對器。請只根據大綱與候選案例的"
                 " title、description，為每個候選案例給出 0 到 1 的相關信心分數。"
