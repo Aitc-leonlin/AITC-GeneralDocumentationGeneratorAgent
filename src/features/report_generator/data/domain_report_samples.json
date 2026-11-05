@@ -2,9 +2,9 @@
   "medical": {
     "domain": "medical",
     "title": "門診服務改善報告",
-    "subject": "示範醫療中心內科門診",
+    "subject": "醫療中心內科門診",
     "period": "2026 年第 3 季",
-    "author": "示範資料",
+    "author": "資料",
     "summary": "分析內科門診等候時間與回診安排，提出可執行的服務改善方向。以下數值均為測試資料。",
     "metrics": [
       {"label": "平均候診時間", "value": "42 分鐘"},
@@ -37,9 +37,9 @@
   "finance": {
     "domain": "finance",
     "title": "中小企業營運評估報告",
-    "subject": "示範商業有限公司",
+    "subject": "商業有限公司",
     "period": "2026 年第 3 季",
-    "author": "示範資料",
+    "author": "資料",
     "summary": "整理營收、流動性與應收帳款變化，供內部討論後續資金規劃。以下數值均為測試資料。",
     "metrics": [
       {"label": "季度營收", "value": "新臺幣 1,280 萬元"},
@@ -72,9 +72,9 @@
   "education": {
     "domain": "education",
     "title": "閱讀課程成效報告",
-    "subject": "示範國中七年級閱讀課程",
+    "subject": "國中七年級閱讀課程",
     "period": "2026 學年度上學期",
-    "author": "示範資料",
+    "author": "資料",
     "summary": "彙整閱讀課程參與情況與學生回饋，作為調整教學活動的參考。以下數值均為測試資料。",
     "metrics": [
       {"label": "參與學生", "value": "96 人"},
@@ -107,9 +107,9 @@
   "food": {
     "domain": "food",
     "title": "餐飲新品企劃報告",
-    "subject": "示範餐館季節餐點",
+    "subject": "餐館季節餐點",
     "period": "2026 年秋季",
-    "author": "示範資料",
+    "author": "資料",
     "summary": "規劃秋季新品定位、備料與試賣觀察項目。以下數值均為測試資料。",
     "metrics": [
       {"label": "預計售價", "value": "新臺幣 280 元"},

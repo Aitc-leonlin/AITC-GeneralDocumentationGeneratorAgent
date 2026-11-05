@@ -1,0 +1,38 @@
+[
+  {
+    "sampleId": "D20_default",
+    "documentTypeId": "D20",
+    "title": "客服平台採購決策資料",
+    "description": "客服平台方案選擇；比較三個方案並提出決策依據；採購小組需在預算內選擇客服平台。"
+  },
+  {
+    "sampleId": "D20_crm_selection",
+    "documentTypeId": "D20",
+    "title": "客服 CRM 平台決策建議案例",
+    "description": "客服 CRM 三方案決策；管理層在三套 CRM 中選擇適合現有客服流程的方案；已知：甲方案年費較低；乙方案整合較完整；丙方案客製彈性高；待查：實測資料遷移成本未知；各供應商 SLA 尚未核"
+  },
+  {
+    "sampleId": "D20_electric_fleet",
+    "documentTypeId": "D20",
+    "title": "配送車隊電動化決策建議案例",
+    "description": "配送車隊更新方案；企業要比較一次換車、分期換車與維持現況；已知：車隊現有 20 輛；每年汰換約 4 輛；有兩處停車基地；待查：充電基礎設施成本未估；不同路線續航需求待查"
+  },
+  {
+    "sampleId": "D20_hybrid_work",
+    "documentTypeId": "D20",
+    "title": "混合辦公政策決策建議案例",
+    "description": "企業混合辦公方案；公司比較固定進辦公室日、團隊自主與全遠距三種安排；已知：員工約 150 人；跨部門會議每週兩次；辦公室座位 100 席；待查：個別職務需求不同；績效和資訊安全影響未驗證"
+  },
+  {
+    "sampleId": "D20_packaging_strategy",
+    "documentTypeId": "D20",
+    "title": "電商包裝策略決策建議案例",
+    "description": "電商包裝方案選擇；品牌在紙箱、補充包與循環包材間做選擇；已知：每月出貨約 5,000 件；破損申訴 1% 為基線；可試點一條產品線；待查：循環回收率未知；各方案單件總成本需實測"
+  },
+  {
+    "sampleId": "D20_training_platform",
+    "documentTypeId": "D20",
+    "title": "員工訓練平台決策建議案例",
+    "description": "員工訓練平台採購；人資部門比較自建、訂閱與委外維運方案；已知：員工約 400 人；每年 30 門課；需追蹤完成率；待查：既有教材轉換工時未知；個資與資料匯出要求待核"
+  }
+]

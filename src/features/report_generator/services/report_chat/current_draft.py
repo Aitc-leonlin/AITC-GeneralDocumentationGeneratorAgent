@@ -154,7 +154,7 @@ def export_current_draft(
     # if sample:
     #     print("==================sample:==================" + sample.model_dump_json())
     #     document.add_heading("預設測試資料", level=1)
-    #     document.add_paragraph("以下資料為虛構測試案例，僅供示範文件產生。")
+    #     document.add_paragraph("以下資料為虛構測試案例，僅供文件產生。")
     #     document.add_paragraph(f"案例：{sample.title}；對象：{sample.subject}；期間：{sample.period}")
     #     document.add_paragraph(sample.context)
     #     table = document.add_table(rows=1, cols=2)

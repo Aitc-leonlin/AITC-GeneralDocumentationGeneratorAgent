@@ -1,0 +1,38 @@
+[
+  {
+    "sampleId": "D25_default",
+    "documentTypeId": "D25",
+    "title": "筆電選購指南資料",
+    "description": "筆電 A、B、C；比較規格、價格與適用情境；使用者需要一台能處理文書與簡單影像編輯的筆電。"
+  },
+  {
+    "sampleId": "D25_student_laptop",
+    "documentTypeId": "D25",
+    "title": "學生筆電選購指南案例",
+    "description": "學生用筆電 A B C；大學生需要文書、視訊及少量影像處理功能；已知：預算為 30,000 元；A 重量較輕；B 續航較長；C 記憶體較大；待查：產品規格與售價均為；保固與維修據點未核"
+  },
+  {
+    "sampleId": "D25_vacuum_cleaner",
+    "documentTypeId": "D25",
+    "title": "小宅吸塵器選購指南案例",
+    "description": "小宅吸塵器甲乙丙；租屋者要比較無線吸塵器的收納與清潔便利性；已知：居住面積約 18 坪；甲較輕；乙配件較多；丙可換電池；待查：吸力數值未實測；耗材成本與噪音需查"
+  },
+  {
+    "sampleId": "D25_air_purifier",
+    "documentTypeId": "D25",
+    "title": "臥室空氣清淨機選購指南案例",
+    "description": "空氣清淨機 A B C；使用者想為臥室選擇清淨設備並控制運轉噪音；已知：臥室面積約 8 坪；A 有定時功能；B 濾網較易取得；C 機身較小；待查：濾網價格與產品認證未查；實際效能不能只看宣傳"
+  },
+  {
+    "sampleId": "D25_desk_chair",
+    "documentTypeId": "D25",
+    "title": "居家辦公椅選購指南案例",
+    "description": "辦公椅甲乙丙；遠距工作者要比較座椅調整功能與尺寸；已知：每日坐約 6 小時；甲扶手可調；乙座深可調；丙有較小外形；待查：人體尺寸和現場試坐未完成；退貨與保固條款待核"
+  },
+  {
+    "sampleId": "D25_coffee_machine",
+    "documentTypeId": "D25",
+    "title": "家用咖啡機選購指南案例",
+    "description": "咖啡機 A B C；家庭比較手沖輔助、膠囊與全自動機型；已知：每日約飲用 2 杯；A 清潔簡單；B 初購價格低；C 可調研磨；待查：耗材與維修成本未知；口味偏好需實際試飲"
+  }
+]

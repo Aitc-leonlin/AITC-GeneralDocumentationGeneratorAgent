@@ -1,0 +1,38 @@
+[
+  {
+    "sampleId": "D08_default",
+    "documentTypeId": "D08",
+    "title": "門診預約系統需求規格資料",
+    "description": "門診預約系統；定義功能、非功能及介接需求；院所準備將電話預約與網頁預約整合。"
+  },
+  {
+    "sampleId": "D08_library_booking",
+    "documentTypeId": "D08",
+    "title": "圖書館討論室預約 SRS 案例",
+    "description": "圖書館討論室預約系統；圖書館要讓讀者線上預約討論室並處理取消；已知：角色含讀者及館員；共有 12 間討論室；預約最長 2 小時；待查：身份驗證方式未定；違規取消規則待核"
+  },
+  {
+    "sampleId": "D08_daycare_attendance",
+    "documentTypeId": "D08",
+    "title": "托育出缺勤系統 SRS 案例",
+    "description": "托育中心出缺勤系統；托育中心要記錄幼兒接送與家長通知；已知：角色含家長、照護員、主管；每天約 80 筆簽到；需記錄接送人；待查：個資保存期限待核；離線補登規則未定"
+  },
+  {
+    "sampleId": "D08_repair_ticket",
+    "documentTypeId": "D08",
+    "title": "設備維修工單 SRS 案例",
+    "description": "設備維修工單系統；製造廠要追蹤設備報修、派工與完工；已知：角色含報修人、技師、主管；設備約 120 台；需上傳照片；待查：故障分類未統一；與資產系統介接格式待定"
+  },
+  {
+    "sampleId": "D08_parking_reservation",
+    "documentTypeId": "D08",
+    "title": "共享車位預約 SRS 案例",
+    "description": "辦公園區車位預約系統；園區要讓員工預約訪客及共用車位；已知：共有 60 個共用車位；角色含員工與管理員；預約以半日為單位；待查：超時處理與車牌資料保存待確認；門禁介接未定"
+  },
+  {
+    "sampleId": "D08_volunteer_shifts",
+    "documentTypeId": "D08",
+    "title": "志工排班 SRS 案例",
+    "description": "志工排班平台；公益組織要管理志工報名、排班與出勤；已知：志工約 200 人；每月 30 個班次；角色含志工與排班員；待查：候補與取消規則未定；通知送達率需定義"
+  }
+]

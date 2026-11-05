@@ -1,0 +1,38 @@
+[
+  {
+    "sampleId": "D11_default",
+    "documentTypeId": "D11",
+    "title": "費用報銷標準作業程序資料",
+    "description": "員工費用報銷流程；統一申請、審核與付款流程；企業希望減少缺件與重複請款。"
+  },
+  {
+    "sampleId": "D11_new_employee_access",
+    "documentTypeId": "D11",
+    "title": "新進員工帳號開通 SOP 案例",
+    "description": "企業新員工帳號開通流程；人資與資訊部門需在到職前完成帳號與基本權限；已知：人資提交到職單；資訊部門建立帳號；主管核准角色權限；待查：缺件時不得先開高權限；離職或延後到職需撤回申請"
+  },
+  {
+    "sampleId": "D11_cold_room_check",
+    "documentTypeId": "D11",
+    "title": "冷藏庫每日巡檢 SOP 案例",
+    "description": "食品倉庫冷藏庫巡檢；值班人員每日檢查冷藏庫設備並記錄異常；已知：早晚各巡檢一次；記錄溫度、門封及警報；主管每日覆核；待查：溫度異常時通報鏈未定；感測器校正紀錄需核"
+  },
+  {
+    "sampleId": "D11_inventory_count",
+    "documentTypeId": "D11",
+    "title": "門市月末盤點 SOP 案例",
+    "description": "連鎖門市月末盤點；各門市需在月末以相同方式盤點商品；已知：盤點前凍結交易時段；兩人交叉複核；差異須附原因；待查：臨時銷售需另記錄；差異門檻及核准人待定"
+  },
+  {
+    "sampleId": "D11_complaint_escalation",
+    "documentTypeId": "D11",
+    "title": "客訴升級處理 SOP 案例",
+    "description": "客服中心客訴升級流程；客服需辨識重大客訴並交由主管處理；已知：一般案件 2 個工作天回覆；涉及人身安全立即升級；工單記錄全程；待查：重大程度分級需定義；個資與錄音權限待核"
+  },
+  {
+    "sampleId": "D11_lab_sample_chain",
+    "documentTypeId": "D11",
+    "title": "檢測樣本交接 SOP 案例",
+    "description": "檢測實驗室樣本交接；實驗室需追蹤樣本從收件到分析前的責任轉移；已知：每件樣本有識別碼；收件記錄外觀與時間；交接雙方簽收；待查：缺標籤樣本處理未定；保存條件和期限需依實際檢測項目核"
+  }
+]

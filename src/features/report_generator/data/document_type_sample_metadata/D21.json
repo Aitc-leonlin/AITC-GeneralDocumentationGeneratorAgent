@@ -1,0 +1,44 @@
+[
+  {
+    "sampleId": "D21_default",
+    "documentTypeId": "D21",
+    "title": "番茄炒蛋食譜｜滑嫩濃郁版",
+    "description": "番茄炒蛋（4 人份）；依食貨誌 ohmylife 的食譜，完整呈現四人份番茄炒蛋的食材用量、料理順序、火候時間、滑蛋與醬汁技巧及其烹調原理。；台式家常菜／中華料理，難度簡單。成品以濃郁番茄味、滑嫩且保有塊狀的雞蛋，以及略帶濃稠度的濕潤醬汁為特色。關鍵順序為雞蛋半熟盛出、爆香蔥白、燉煮番茄、加入番茄醬、勾芡、關火加醋、雞蛋回鍋拌勻。"
+  },
+  {
+    "sampleId": "D21_microwave_vongole",
+    "documentTypeId": "D21",
+    "title": "微波版白酒蛤蜊義大利麵食譜",
+    "description": "一人份 Spaghetti alle vongole 微波食譜；80 克義大利直麵、200 克已吐沙蛤蜊，搭配蒜泥、白酒與橄欖油。以 600W 分兩階段微波：先煮麵 8 分鐘，再加入蛤蜊加熱約 3 分鐘；涵蓋乾麵與水 1：2.5 比例、深型可微波容器、熟度確認，以及原文白酒用量差異。來源為食貨誌 ohmylife 於 2025 年 4 月 18 日發布的白酒蛤蜊麵食譜。"
+  },
+  {
+    "sampleId": "D21_pan_seared_steak",
+    "documentTypeId": "D21",
+    "title": "蒜香奶油煎牛排食譜",
+    "description": "兩人份平底鍋厚切牛排；每塊約 220 克、厚約 2.5 公分，以鹽乾醃、兩面煎上色，再用蒜香奶油淋油。使用中心溫度計確認熟度，靜置後逆紋切片。原創案例。"
+  },
+  {
+    "sampleId": "D21_glazed_donuts",
+    "documentTypeId": "D21",
+    "title": "經典糖霜甜甜圈食譜",
+    "description": "約 8 個酵母發酵環形甜甜圈；包含麵粉、牛奶、雞蛋與奶油比例、兩次發酵、整形、170～180°C 分批油炸及糖粉牛奶糖霜。原創案例。"
+  },
+  {
+    "sampleId": "D21_shoyu_ramen",
+    "documentTypeId": "D21",
+    "title": "醬油雞湯拉麵食譜",
+    "description": "兩人份家常醬油雞湯拉麵；以無鹽雞高湯、醬油、味醂、薑蒜與香菇煮湯，鮮拉麵另鍋煮熟，搭配熟雞肉、全熟蛋、蔥花和海苔。原創案例。"
+  },
+  {
+    "sampleId": "D21_margherita_pizza",
+    "documentTypeId": "D21",
+    "title": "瑪格麗特 Pizza 食譜",
+    "description": "兩張約 25 公分的家用烤箱瑪格麗特 Pizza；麵糰發酵與整形後，鋪番茄醬和低含水莫札瑞拉起司，以 230～250°C 烘烤，出爐再加羅勒。原創案例。"
+  },
+  {
+    "sampleId": "D21_herb_roast_chicken",
+    "documentTypeId": "D21",
+    "title": "香草檸檬烤雞食譜",
+    "description": "約四人份、1.5 公斤未填餡全雞；以鹽、胡椒、檸檬、蒜與香草調味，200°C 家用烤箱烘烤，量測胸肉與腿肉中心溫度後靜置切分。原創案例。"
+  }
+]

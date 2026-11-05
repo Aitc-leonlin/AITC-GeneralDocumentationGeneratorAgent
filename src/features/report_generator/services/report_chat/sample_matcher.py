@@ -31,7 +31,7 @@ def _candidate_ids(
     outline: GeneralDocumentOutline | PurposeDocumentOutline,
     classified_document_type_id: str | None,
 ) -> list[str]:
-    """D 範本分類是候選資料的預篩；日後可換成 DB 的分類欄位查詢。"""
+    """只使用先前大綱規劃選出的 D 類型，不擴展到同分類的其他 D 類型。"""
     templates = load_document_type_templates()
     if isinstance(outline, GeneralDocumentOutline):
         reference_ids = [outline.documentTypeId]
@@ -43,15 +43,9 @@ def _candidate_ids(
         ]
         if not reference_ids and classified_document_type_id:
             reference_ids = [classified_document_type_id]
-    categories = {
-        templates[template_id].category
-        for template_id in reference_ids
-        if template_id in templates
-    }
     return [
-        template_id
-        for template_id, template in templates.items()
-        if template.category in categories
+        template_id for template_id in dict.fromkeys(reference_ids)
+        if template_id in templates
     ]
 
 
@@ -74,11 +68,18 @@ def match_document_type_sample(
         ],
     }
     try:
+        candidate_document_type_ids = _candidate_ids(
+            outline, classified_document_type_id
+        )
         metadata = load_document_type_sample_metadata(
-            _candidate_ids(outline, classified_document_type_id)
+            candidate_document_type_ids
         )
         if not metadata:
             return None
+        logger.info(
+            "document sample metadata candidates document_type_ids=%s count=%d",
+            candidate_document_type_ids, len(metadata),
+        )
         from src.features.chatbot.core.providers.chat_openAI_provider import chat_model
 
         result = _invoke_report_structured(

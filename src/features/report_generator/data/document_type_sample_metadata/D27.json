@@ -1,0 +1,38 @@
+[
+  {
+    "sampleId": "D27_default",
+    "documentTypeId": "D27",
+    "title": "生日聚會活動企劃資料",
+    "description": " 30 人生日聚會；安排場地、流程、預算及工作分工；主辦人希望舉辦四小時的室內生日聚會。"
+  },
+  {
+    "sampleId": "D27_birthday_gathering",
+    "documentTypeId": "D27",
+    "title": "三十人生日聚會企劃案例",
+    "description": "三十人生日聚會；主辦人想辦一場含餐飲、遊戲與拍照的室內聚會；已知：預計 30 人；場地可用 4 小時；預算為 60,000 元；待查：飲食過敏與場地設備未核；臨時缺席需備案"
+  },
+  {
+    "sampleId": "D27_small_wedding",
+    "documentTypeId": "D27",
+    "title": "小型婚禮茶會企劃案例",
+    "description": "六十人婚禮茶會；新人希望安排簡單儀式、茶點與家人合照；已知：預計 60 人；場地有室內與庭院；預算為 300,000 元；待查：雨天動線未定；攝影授權和場地服務細節待確認"
+  },
+  {
+    "sampleId": "D27_charity_market",
+    "documentTypeId": "D27",
+    "title": "社區公益市集企劃案例",
+    "description": "社區公益市集；社區組織希望邀請攤商並安排捐款說明區；已知：預計 20 個攤位；志工 15 人；預估參與者 300 人；待查：場地許可與捐款處理規則待核；天候備案未定"
+  },
+  {
+    "sampleId": "D27_design_workshop",
+    "documentTypeId": "D27",
+    "title": "創意工作坊活動企劃案例",
+    "description": "社區設計工作坊；講師要帶領參與者完成簡單紙模型；已知：預計 24 名參與者；活動 3 小時；材料包每人一份；待查：工具安全與年齡限制待核；材料缺件需備用"
+  },
+  {
+    "sampleId": "D27_alumni_reunion",
+    "documentTypeId": "D27",
+    "title": "校友重聚晚餐企劃案例",
+    "description": "四十人校友重聚晚餐；主辦人要兼顧敘舊、簡短致詞與照片整理；已知：預計 40 人；餐廳包廂可用 3 小時；以線上表單報名；待查：餐飲禁忌未收齊；付款分攤與取消規則未定"
+  }
+]

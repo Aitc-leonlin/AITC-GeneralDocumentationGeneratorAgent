@@ -1,0 +1,38 @@
+[
+  {
+    "sampleId": "D09_default",
+    "documentTypeId": "D09",
+    "title": "門診預約系統設計資料",
+    "description": "門診預約系統架構；描述元件、資料流與技術設計；系統預計由網頁前端、API、排程服務與資料庫組成。"
+  },
+  {
+    "sampleId": "D09_library_architecture",
+    "documentTypeId": "D09",
+    "title": "圖書館預約系統設計案例",
+    "description": "圖書館討論室預約架構；設計讀者入口、館員後台及可用時段服務；已知：前端與 API 分離；預約資料存關聯式資料庫；通知採佇列處理；待查：重複預約防護待設計；通知失敗補償需確認"
+  },
+  {
+    "sampleId": "D09_attendance_architecture",
+    "documentTypeId": "D09",
+    "title": "托育出缺勤系統設計案例",
+    "description": "托育出缺勤系統架構；設計現場簽到、家長通知及主管查詢流程；已知：平板簽到端；後端 API；出勤事件寫入資料庫；待查：離線同步衝突待設計；敏感資料存取控制需檢查"
+  },
+  {
+    "sampleId": "D09_repair_architecture",
+    "documentTypeId": "D09",
+    "title": "維修工單平台設計案例",
+    "description": "設備維修工單架構；設計報修表單、派工服務及技師行動端；已知：工單服務與資產資料服務分離；照片存物件儲存；狀態變更留事件紀錄；待查：工單重複提交待處理；照片存取期限需定"
+  },
+  {
+    "sampleId": "D09_parking_architecture",
+    "documentTypeId": "D09",
+    "title": "車位預約系統設計案例",
+    "description": "園區車位預約架構；設計時段庫存、預約鎖定與門禁資訊交換；已知：使用者入口與管理後台分離；預約資料存關聯式資料庫；門禁以批次同步；待查：並發搶位需防重；門禁資料錯誤補償待設計"
+  },
+  {
+    "sampleId": "D09_volunteer_architecture",
+    "documentTypeId": "D09",
+    "title": "志工排班平台設計案例",
+    "description": "志工排班平台架構；設計班次建立、候補遞補和通知服務；已知：班次資料庫；候補佇列；通知外送服務與後台；待查：遞補競態需處理；個資最小化與紀錄保留待確認"
+  }
+]

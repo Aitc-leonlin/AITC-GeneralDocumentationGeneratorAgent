@@ -20,7 +20,7 @@ SHEETS = [
             ["前後端", "授信報告產生", "可依公司與年度產生 DOCX 授信報告，記錄歷史、dashboard 摘要、下載檔案。", "/report-generator, /report-generator/history", "/api/report-generator/*"],
             ["前後端", "會員登入與帳號安全", "支援登入、refresh token、登出、目前使用者、session、忘記密碼、重設密碼、email 驗證。", "/login, /forgot-password, /reset-password, /verify-email", "/api/membership/auth/*"],
             ["前後端", "會員與權限管理", "支援使用者、角色、權限、權限分組、使用者角色、角色權限、選單權限、組織與資料權限管理。", "/membership/*", "/api/membership/*"],
-            ["前端", "展示/範例頁", "保留 LangChain、AI SDK、retrieval、structured output、agent/tools 等示範頁，主要作為研發展示。", "/agents, /retrieval, /retrieval_agents, /langgraph, /structured_output, /ai_sdk/*", "部分為前端 demo，正式後端 API 未完整對應"],
+            ["前端", "展示/範例頁", "保留 LangChain、AI SDK、retrieval、structured output、agent/tools 等頁，主要作為研發展示。", "/agents, /retrieval, /retrieval_agents, /langgraph, /structured_output, /ai_sdk/*", "部分為前端 demo，正式後端 API 未完整對應"],
         ],
     ),
     (

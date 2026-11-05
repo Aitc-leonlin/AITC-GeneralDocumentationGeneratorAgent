@@ -47,7 +47,7 @@ API 入口在 `api/report_generator.py`，Thread 的資料庫讀寫在 `services
 
 「下載目前版本 DOCX」的 JSON 取用、逐章撰寫與未來 DB 接點整理於 [`JSON_RAG_OVERVIEW.md`](JSON_RAG_OVERVIEW.md)。
 
-[`data/document_type_samples/`](data/document_type_samples/) 為 D01～D30 各保留一份以 D ID 命名的預設 JSON，也可在同一 D 類型下增加其他案例，例如 `D21_microwave_vongole.json`。每份案例包含情境、目標、輸入事實、來源描述與假設；metadata 以獨立 `sampleId` 對應檔名，並用 `documentTypeId` 歸類。`services/report_chat/samples.py` 定義案例結構、metadata 與完整資料的載入。分類與大綱規劃階段不載入完整案例。下載文件時先依範本分類取得候選 metadata，再由 LLM 比對大綱的具體主題。只有最高分案例直接相關且信心達 0.8 才讀取完整 JSON 逐章撰寫；未達門檻時改由 `DOCX_CONTENT_GRAPH` 的 `draft_from_outline` 節點一次產出所有章節，不讀取案例 JSON；明確指定只用使用者資料時不執行此分流。
+[`data/document_type_samples/`](data/document_type_samples/) 為 D01～D30 各保留一份預設案例；案例檔名一律使用 `Dxx_後綴.json`，其中 D01 預設案例為 `D01_default.json`，也可在同一 D 類型下增加其他案例，例如 `D21_microwave_vongole.json`。每份案例包含情境、目標、輸入事實、來源描述與假設；metadata 依 D 類型分別存於 [`data/document_type_sample_metadata/`](data/document_type_sample_metadata/)，以獨立 `sampleId` 對應案例檔名。`services/report_chat/samples.py` 定義案例結構、metadata 與完整資料的載入。分類與大綱規劃階段不載入完整案例。下載文件時只讀先前規劃選出的 D 類型之 metadata，再由 LLM 比對大綱的具體主題；多用途文件可合併多個 D 類型的候選。只有最高分案例直接相關且信心達 0.8 才讀取完整 JSON 逐章撰寫；未達門檻時改由 `DOCX_CONTENT_GRAPH` 的 `draft_from_outline` 節點一次產出所有章節，不讀取案例 JSON；明確指定只用使用者資料時不執行此分流。
 
 新用途流程透過 Thread 訊息入口回傳 `purposePlan`、`purposeOutline` 與 LLM 紀錄；需要追問時回傳 `pendingClarification`。Thread 會保存這些欄位供下一則訊息沿用。單一 D 計畫的 `documentTypeId`、`generalPlan`、`generalOutline` 仍可讀取；後續訊息一律轉入用途規劃流程。
 

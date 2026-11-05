@@ -1,4 +1,4 @@
-"""為既存固定格式資料產生可重抽的 JSON 示範內容。"""
+"""為既存固定格式資料產生可重抽的 JSON 內容。"""
 
 import re
 from copy import deepcopy
@@ -9,10 +9,10 @@ from typing import Any
 NUMBER_PATTERN = re.compile(r"\d[\d,]*(?:\.\d+)?")
 
 SUBJECT_OPTIONS = {
-    "medical": ["示範醫療中心內科門診", "示範區域醫院家醫科門診", "示範社區診所一般門診"],
-    "finance": ["示範商業有限公司", "示範零售股份有限公司", "示範製造企業有限公司"],
-    "education": ["示範國中七年級閱讀課程", "示範國中八年級閱讀課程", "示範學校閱讀社團"],
-    "food": ["示範餐館季節餐點", "示範輕食店午間套餐", "示範咖啡館季節新品"],
+    "medical": ["醫療中心內科門診", "區域醫院家醫科門診", "社區診所一般門診"],
+    "finance": ["商業有限公司", "零售股份有限公司", "製造企業有限公司"],
+    "education": ["國中七年級閱讀課程", "國中八年級閱讀課程", "學校閱讀社團"],
+    "food": ["餐館季節餐點", "輕食店午間套餐", "咖啡館季節新品"],
 }
 
 
@@ -94,11 +94,11 @@ def _finance_content(report: dict[str, Any], randomizer: SystemRandom) -> None:
         "營業現金流量": f"新臺幣 {cash_flow:,} 萬元",
     })
     report["summary"] = (
-        f"{report['subject']}本季示範營收為新臺幣 {revenue:,} 萬元、淨利率約 {net_margin}%。"
+        f"{report['subject']}本季營收為新臺幣 {revenue:,} 萬元、淨利率約 {net_margin}%。"
         "以下數值為隨機測試資料，供檢視報告格式與分析流程。"
     )
     report["sections"][0]["details"] = (
-        f"本季示範營收 {revenue:,} 萬元、營業利益約 {operating_profit:,} 萬元；"
+        f"本季營收 {revenue:,} 萬元、營業利益約 {operating_profit:,} 萬元；"
         "應收帳款與現金流為後續觀察重點。"
     )
     report["sections"][1]["details"] = randomizer.choice([
@@ -117,7 +117,7 @@ def _education_content(report: dict[str, Any], randomizer: SystemRandom) -> None
         "短篇文本完成率": f"{short_completion}%",
     })
     report["summary"] = (
-        f"{report['subject']}本次示範共有 {students} 名學生參與，"
+        f"{report['subject']}本次共有 {students} 名學生參與，"
         f"短篇與長篇文本完成率分別為 {short_completion}% 與 {long_completion}%。"
         "以下為隨機測試資料。"
     )
@@ -156,10 +156,10 @@ def _food_content(report: dict[str, Any], randomizer: SystemRandom) -> None:
     })
     report["summary"] = (
         f"{report['subject']}預計售價新臺幣 {price} 元，"
-        f"示範試賣 {weeks} 週、累計售出 {sold} 份。以下均為隨機測試資料。"
+        f"試賣 {weeks} 週、累計售出 {sold} 份。以下均為隨機測試資料。"
     )
     report["sections"][0]["details"] = (
-        f"每份示範售價 {price} 元、食材成本約 {cost} 元；"
+        f"每份售價 {price} 元、食材成本約 {cost} 元；"
         "以當季食材與簡潔出餐流程作為產品定位。"
     )
     report["sections"][1]["details"] = randomizer.choice([

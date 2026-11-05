@@ -1,0 +1,38 @@
+[
+  {
+    "sampleId": "D05_default",
+    "documentTypeId": "D05",
+    "title": "專案管理軟體競品分析資料",
+    "description": "專案管理軟體方案 A、B、C；比較三個方案的成本與功能；一個 80 人團隊要選擇新的專案管理工具。"
+  },
+  {
+    "sampleId": "D05_crm_suite",
+    "documentTypeId": "D05",
+    "title": "中小企業 CRM 競品比較案例",
+    "description": " CRM 方案甲乙丙；企業準備導入 CRM，比較銷售流程、報表和整合能力；已知：甲方案重自動化；乙方案重低價；丙方案重客製化；待查：實際報價未取得；資料匯出與退出成本需驗證"
+  },
+  {
+    "sampleId": "D05_meal_delivery",
+    "documentTypeId": "D05",
+    "title": "團膳配送平台競品比較案例",
+    "description": "團膳配送平台 A B C；公司評估三種員工餐點訂購平台；已知：A 有多店選擇；B 有定期菜單；C 有企業補助管理；待查：供應商覆蓋率未查；過敏資訊與退款規則待核"
+  },
+  {
+    "sampleId": "D05_power_tools",
+    "documentTypeId": "D05",
+    "title": "電動工具競品比較案例",
+    "description": "電動起子機 A B C；維修團隊比較工具續航、重量及保固；已知：A 重量較輕；B 電池容量較大；C 配件較完整；待查：標示規格尚未實測；電池相容性需確認"
+  },
+  {
+    "sampleId": "D05_note_apps",
+    "documentTypeId": "D05",
+    "title": "團隊筆記軟體競品比較案例",
+    "description": "筆記軟體甲乙丙；跨部門團隊比較協作筆記與權限功能；已知：甲有離線模式；乙有進階搜尋；丙有審核流程；待查：實際權限模型和匯出格式待驗；遷移工時未知"
+  },
+  {
+    "sampleId": "D05_shipping_packages",
+    "documentTypeId": "D05",
+    "title": "電商包裝方案競品比較案例",
+    "description": "物流包裝方案 A B C；電商團隊比較紙箱、可回收袋與循環箱方案；已知：A 單次成本低；B 重量輕；C 可重複使用；待查：運送破損率未測；回收成本與客戶接受度未知"
+  }
+]

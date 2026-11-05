@@ -1,0 +1,38 @@
+[
+  {
+    "sampleId": "D28_default",
+    "documentTypeId": "D28",
+    "title": " Python 自學計畫資料",
+    "description": "試算表自動化初學者；規劃從基礎語法到小型專案的學習路線；使用者具備試算表操作經驗，希望能自動整理 CSV。"
+  },
+  {
+    "sampleId": "D28_python_automation",
+    "documentTypeId": "D28",
+    "title": "Python 表格自動化自學計畫案例",
+    "description": " Python 初學者學習表格處理；學習者想把每週重複的表格整理工作自動化；已知：每週可學 5 小時；已會基本試算表；目標產出一個本地腳本；待查：程式環境和資料隱私需注意；不能用真實客戶資料練習"
+  },
+  {
+    "sampleId": "D28_spoken_english",
+    "documentTypeId": "D28",
+    "title": "英語口說練習計畫案例",
+    "description": "成人英語口說入門；學習者希望能在日常旅遊情境進行簡短對話；已知：每週可練 4 天各 20 分鐘；已有基礎單字；可錄音自評；待查：發音與流利度需真人回饋；目標情境範圍需聚焦"
+  },
+  {
+    "sampleId": "D28_ux_basics",
+    "documentTypeId": "D28",
+    "title": "UX 設計入門學習計畫案例",
+    "description": "產品企劃 UX 入門；產品企劃想理解使用者訪談與線框設計；已知：每週 6 小時；可招募 5 位模擬受訪者；使用免費設計工具；待查：樣本代表性不足；不可把單次訪談當市場結論"
+  },
+  {
+    "sampleId": "D28_watercolor",
+    "documentTypeId": "D28",
+    "title": "水彩風景自學計畫案例",
+    "description": "水彩初學者學習風景畫；初學者想練習濕畫法、色彩混合和簡單構圖；已知：每週可畫 3 次各 30 分鐘；已有基本畫具；每週完成一張小作品；待查：作品乾燥時間與紙張差異需觀察；進度不能只按張數評估"
+  },
+  {
+    "sampleId": "D28_statistics_intro",
+    "documentTypeId": "D28",
+    "title": "資料分析統計入門計畫案例",
+    "description": "非統計背景工作者學習統計；工作者希望能理解平均、分布、抽樣與圖表誤導；已知：每週可學 5 小時；已有試算表能力；使用資料練習；待查：不能把相關當因果；真實資料品質與隱私尚未處理"
+  }
+]

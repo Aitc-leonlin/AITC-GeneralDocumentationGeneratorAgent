@@ -2,7 +2,7 @@
   "medical": {
     "domain": "medical",
     "defaultTitle": "門診服務改善報告",
-    "defaultSubject": "示範醫療中心內科門診",
+    "defaultSubject": "醫療中心內科門診",
     "defaultPeriod": "2026 年第 3 季",
     "metricLabels": [
       "平均候診時間",
@@ -30,7 +30,7 @@
   "finance": {
     "domain": "finance",
     "defaultTitle": "中小企業營運評估報告",
-    "defaultSubject": "示範商業有限公司",
+    "defaultSubject": "商業有限公司",
     "defaultPeriod": "2026 年第 3 季",
     "metricLabels": [
       "季度營收",
@@ -58,7 +58,7 @@
   "education": {
     "domain": "education",
     "defaultTitle": "閱讀課程成效報告",
-    "defaultSubject": "示範國中七年級閱讀課程",
+    "defaultSubject": "國中七年級閱讀課程",
     "defaultPeriod": "2026 學年度上學期",
     "metricLabels": [
       "參與學生",
@@ -86,7 +86,7 @@
   "food": {
     "domain": "food",
     "defaultTitle": "餐飲新品企劃報告",
-    "defaultSubject": "示範餐館季節餐點",
+    "defaultSubject": "餐館季節餐點",
     "defaultPeriod": "2026 年秋季",
     "metricLabels": [
       "預計售價",
