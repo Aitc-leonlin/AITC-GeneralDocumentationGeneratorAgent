@@ -35,6 +35,13 @@ class ReportThreadConflict(Exception):
     """Another request changed the thread while its next outline was being drafted."""
 
 
+class ReportOutlineRevision(BaseModel):
+    """The outline immediately before the latest saved outline change."""
+
+    previousGeneralOutline: GeneralDocumentOutline | None = None
+    previousPurposeOutline: PurposeDocumentOutline | None = None
+
+
 class ReportThreadState(BaseModel):
     messages: list[ReportChatMessage] = Field(default_factory=list)
     documentTypeId: str | None = None
@@ -42,6 +49,7 @@ class ReportThreadState(BaseModel):
     generalOutline: GeneralDocumentOutline | None = None
     purposePlan: PurposeDocumentPlan | None = None
     purposeOutline: PurposeDocumentOutline | None = None
+    outlineRevision: ReportOutlineRevision | None = None
     pendingClarification: PendingClarification | None = None
     sourceMode: Literal["default_json", "user_data"] | None = None
     sampleSelection: ReportSampleSelection | None = None
@@ -93,6 +101,12 @@ def add_report_thread_message(
                 raise PermissionError("報告對話不存在")
 
     previous = ReportThreadState.model_validate(existing or {})
+    previous_general_outline = (
+        previous.generalOutline.model_copy(deep=True) if previous.generalOutline else None
+    )
+    previous_purpose_outline = (
+        previous.purposeOutline.model_copy(deep=True) if previous.purposeOutline else None
+    )
     content = command.content.strip()
     if not content:
         raise ValueError("請輸入報告需求")
@@ -111,6 +125,10 @@ def add_report_thread_message(
             currentSampleSelection=previous.sampleSelection,
         )
     )
+    outline_changed = (
+        previous_general_outline != result.generalOutline
+        or previous_purpose_outline != result.purposeOutline
+    )
     state = ReportThreadState(
         messages=[
             *previous.messages,
@@ -122,6 +140,13 @@ def add_report_thread_message(
         generalOutline=result.generalOutline,
         purposePlan=result.purposePlan,
         purposeOutline=result.purposeOutline,
+        outlineRevision=(
+            ReportOutlineRevision(
+                previousGeneralOutline=previous_general_outline,
+                previousPurposeOutline=previous_purpose_outline,
+            )
+            if outline_changed else previous.outlineRevision
+        ),
         pendingClarification=result.pendingClarification,
         sourceMode=result.sourceMode,
         sampleSelection=result.sampleSelection,
