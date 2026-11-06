@@ -1,21 +1,25 @@
 """對話階段：分類需求並產生可確認的大綱。"""
 
-import json
+import logging
 import re
 from typing import Any, Literal, TypedDict
 
 from langgraph.graph import END, START, StateGraph
-from pydantic import BaseModel, Field
 
 from src.features.report_generator.services.domain_report_service import ReportLLMTrace
 from .catalog import load_document_type_templates
 from .document_type_graph import classify_document_type
-from .llm import _invoke_report_structured
+from .open_sample_agent import choose_open_sample
 from .purpose_workflow import assess_purpose_readiness, pending_from_decision, plan_purpose_document
+from .question_agent import answer_report_question
 from .schemas import (
     DocumentPurpose, DocumentTypeTemplate, InvalidReportRequest, PendingClarification,
     ReportOutlineRequest, ReportOutlineResponse, ReportQuestionPlan,
+    ReportSampleSelection, ReportToolUsage, required_source_satisfied,
 )
+
+
+logger = logging.getLogger("uvicorn.error")
 
 
 def create_report_outline(request: ReportOutlineRequest) -> ReportOutlineResponse:
@@ -47,11 +51,9 @@ class OutlineGraphState(TypedDict, total=False):
     pending_clarification: PendingClarification | None
     document_template: DocumentTypeTemplate | None
     source_mode: Literal["default_json", "user_data"] | None
+    sample_selection: ReportSampleSelection | None
+    tool_usages: list[ReportToolUsage]
     response: ReportOutlineResponse
-
-
-class QuestionAnswer(BaseModel):
-    answer: str = Field(min_length=1, max_length=1000)
 
 
 def _outline_load_context(state: OutlineGraphState) -> OutlineGraphState:
@@ -63,6 +65,7 @@ def _outline_load_context(state: OutlineGraphState) -> OutlineGraphState:
     return {
         "model": chat_model,
         "traces": [],
+        "tool_usages": [],
         "document_templates": load_document_type_templates(),
     }
 
@@ -102,48 +105,32 @@ def _outline_assess(state: OutlineGraphState) -> OutlineGraphState:
     ) for index, item in enumerate(raw, start=1)]
     decision, traces = assess_purpose_readiness(request, state["plan"], purposes, state["model"], state["traces"])
     pending = pending_from_decision(decision, purposes) if not decision.ready else None
-    source_mode = _general_source_mode(state)
-    if pending is None and source_mode == "default_json":
-        references = {item for purpose in purposes for item in purpose.referenceTemplateIds}
-        if len(purposes) != 1 or len(references) != 1:
-            pending = PendingClarification(
-                question=(
-                    "目前沒有對應這份文件的測試 JSON。請提供資料，或指定要使用哪一種 Document Type 的測試案例。"
-                    if not references else
-                    "目前的預設測試 JSON 各自對應一種範本。這份文件要改用你提供的資料，還是先只做其中一種範本的測試案例？"
-                ),
-                missingDecision="測試資料來源", purposes=purposes,
-            )
     return {"purposes": purposes, "pending_clarification": pending, "traces": traces}
 
 
 def _intent_route(state: OutlineGraphState) -> Literal["answer", "assess"]:
-    return "answer" if state["plan"].intent in ("ask_question", "out_of_scope") else "assess"
+    intent = state["plan"].intent
+    if intent in ("ask_question", "out_of_scope"):
+        return "answer"
+    logger.info(
+        "report_question.decide_lookup.not_entered reason=intent_route intent=%s question=%s",
+        intent, state["request"].messages[-1].content,
+    )
+    return "assess"
 
 
 def _outline_answer_question(state: OutlineGraphState) -> OutlineGraphState:
     request = state["request"]
     plan = state["plan"]
-    traces = list(state["traces"])
-    answer = _invoke_report_structured(
-        model=state["model"], schema=QuestionAnswer,
-        operation="report_outline.answer_question", traces=traces,
-        prompt=(
-            "你是通用文件助手。請直接回答使用者最新的問題，不修改既有文件或大綱。"
-            "參考完整對話、目前文件狀態及 Document Type 目錄；目錄只供參考，"
-            "不能據此宣稱任何領域都必須套用特定範本。"
-            "若問題與文件工作無關，簡短說明你能協助規劃、修訂或解釋文件。"
-            "若缺乏資料，明確說明尚未提供，不要臆造事實。回答請使用繁體中文。\n"
-            f"分類結果：{plan.model_dump_json()}\n"
-            f"文件種類目錄：{json.dumps([{'id': item.id, 'name': item.name, 'category': item.category, 'purpose': item.purpose} for item in state['document_templates'].values()], ensure_ascii=False)}\n"
-            f"目前用途計畫：{request.currentPurposePlan.model_dump_json() if request.currentPurposePlan else 'null'}\n"
-            f"目前用途大綱：{request.currentPurposeOutline.model_dump_json() if request.currentPurposeOutline else 'null'}\n"
-            f"目前文件範本大綱：{request.currentGeneralOutline.model_dump_json() if request.currentGeneralOutline else 'null'}\n"
-            f"對話：{json.dumps([message.model_dump() for message in request.messages], ensure_ascii=False)}"
-        ),
+    source_mode = _general_source_mode(state)
+    answer, traces, tool_usages = answer_report_question(
+        request=request, plan=plan, templates=state["document_templates"],
+        model=state["model"], traces=state["traces"],
+        allow_samples=plan.intent == "ask_question" and source_mode != "user_data",
+        source_mode=source_mode,
     )
     return {"traces": traces, "response": ReportOutlineResponse(
-        assistantMessage=answer.answer,
+        assistantMessage=answer,
         documentTemplate=state["document_templates"].get(request.currentDocumentTypeId),
         generalPlan=request.currentGeneralPlan,
         generalOutline=request.currentGeneralOutline,
@@ -151,7 +138,9 @@ def _outline_answer_question(state: OutlineGraphState) -> OutlineGraphState:
         purposeOutline=request.currentPurposeOutline,
         pendingClarification=request.pendingClarification,
         sourceMode=request.currentSourceMode,
+        sampleSelection=request.currentSampleSelection,
         llmTraces=traces,
+        toolUsages=tool_usages,
     )}
 
 
@@ -178,6 +167,56 @@ def _outline_resolve_source(state: OutlineGraphState) -> OutlineGraphState:
     return {"source_mode": _general_source_mode(state)}
 
 
+def _outline_route_sample(state: OutlineGraphState) -> OutlineGraphState:
+    selection, traces, usages = choose_open_sample(
+        request=state["request"], purposes=state["purposes"],
+        model=state["model"], traces=state["traces"],
+        fallback_document_type_id=(
+            state["document_template"].id if state.get("document_template") else None
+        ),
+        allow_tools=state["source_mode"] != "user_data",
+    )
+    pending = None
+    if not required_source_satisfied(selection):
+        questions = {
+            "case": "這份文件需要符合需求的案例資料，目前沒有找到可採用的案例。請提供案例內容，或明確告訴我改用一般性示例。",
+            "user_data": "這份文件需要依據你提供的資料，但目前對話中還沒有足夠的資料內容。請貼上資料，或明確告訴我改用一般性示例。",
+            "external": "這份文件需要外部真實資料查證，目前案例工具無法完成查證。請提供要引用的資料內容與來源，或明確告訴我改成一般性示例。",
+            "any": "這份文件需要具體資料支撐，目前沒有足夠的可用來源。請提供資料內容與來源，或明確告訴我改用一般性示例。",
+        }
+        question = questions[selection.requiredSource]
+        if selection.requiredSource in ("case", "any") and selection.outputMode != "single":
+            covered_count = len(selection.outputCoverage)
+            matched_subjects = {item.label for item in selection.outputCoverage}
+            missing_subjects = [
+                item for item in selection.comparisonSubjects
+                if item not in matched_subjects
+            ]
+            missing_text = (
+                f"；尚缺少「{'、'.join(missing_subjects)}」的對應資料"
+                if missing_subjects else ""
+            )
+            question = (
+                f"這份文件要求 {selection.requestedCount} 個有資料支撐的選項或比較對象，"
+                f"目前只有 {covered_count} 個項目有案例資料支援{missing_text}。"
+                "請提供缺少的資料，或明確告訴我改用一般性示例。"
+            )
+        pending = PendingClarification(
+            question=question,
+            missingDecision="必要參考資料", purposes=state["purposes"],
+        )
+    return {
+        "sample_selection": selection,
+        "pending_clarification": pending,
+        "traces": traces,
+        "tool_usages": [*state["tool_usages"], *usages],
+    }
+
+
+def _sample_source_route(state: OutlineGraphState) -> Literal["clarify", "classified"]:
+    return "clarify" if state.get("pending_clarification") else "classified"
+
+
 def _outline_classified(state: OutlineGraphState) -> OutlineGraphState:
     purposes = state["purposes"]
     if not purposes:
@@ -191,6 +230,7 @@ def _outline_classified(state: OutlineGraphState) -> OutlineGraphState:
         current_plan=request.currentPurposePlan,
         current_outline=request.currentPurposeOutline,
         source_mode=state["source_mode"],
+        sample_selection=state.get("sample_selection"),
     )
     names = "、".join(item.description for item in purpose_plan.purposes)
     return {"traces": traces, "response": ReportOutlineResponse(
@@ -202,7 +242,9 @@ def _outline_classified(state: OutlineGraphState) -> OutlineGraphState:
         purposeOutline=purpose_outline,
         documentTemplate=state["document_template"],
         sourceMode=state["source_mode"],
+        sampleSelection=state.get("sample_selection"),
         llmTraces=traces,
+        toolUsages=state["tool_usages"],
     )}
 
 
@@ -217,8 +259,10 @@ def _outline_clarify(state: OutlineGraphState) -> OutlineGraphState:
         purposePlan=request.currentPurposePlan,
         purposeOutline=request.currentPurposeOutline,
         pendingClarification=pending,
-        sourceMode=_general_source_mode(state) if pending else request.currentSourceMode,
+        sourceMode=(state.get("source_mode") or _general_source_mode(state)) if pending else request.currentSourceMode,
+        sampleSelection=state.get("sample_selection") or request.currentSampleSelection,
         llmTraces=state["traces"],
+        toolUsages=state.get("tool_usages", []),
     )}
 
 
@@ -228,6 +272,7 @@ _outline_builder.add_node("classify_question", _outline_classify)
 _outline_builder.add_node("assess_readiness", _outline_assess)
 _outline_builder.add_node("answer_question", _outline_answer_question)
 _outline_builder.add_node("resolve_source_mode", _outline_resolve_source)
+_outline_builder.add_node("route_open_sample", _outline_route_sample)
 _outline_builder.add_node("classified", _outline_classified)
 _outline_builder.add_node("clarify", _outline_clarify)
 _outline_builder.add_edge(START, "load_context")
@@ -238,7 +283,10 @@ _outline_builder.add_conditional_edges("classify_question", _intent_route, {
 _outline_builder.add_conditional_edges("assess_readiness", _assessed_route, {
     "classified": "resolve_source_mode", "clarify": "clarify",
 })
-_outline_builder.add_edge("resolve_source_mode", "classified")
+_outline_builder.add_edge("resolve_source_mode", "route_open_sample")
+_outline_builder.add_conditional_edges("route_open_sample", _sample_source_route, {
+    "clarify": "clarify", "classified": "classified",
+})
 _outline_builder.add_edge("classified", END)
 _outline_builder.add_edge("clarify", END)
 _outline_builder.add_edge("answer_question", END)

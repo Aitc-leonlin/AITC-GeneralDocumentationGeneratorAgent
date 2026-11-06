@@ -1,16 +1,25 @@
 # 通用文件 DOCX：JSON 資料取用總覽
 
-下載「目前版本 DOCX」時，若有大綱且對話未指定只用使用者資料，`DOCX_CONTENT_GRAPH` 只讀取先前規劃選出的 D 類型之案例 metadata，再把候選的 title、description 與大綱交給 LLM 比對；多用途文件可對應多個 D 類型。具體主題相符且最高信心達 0.8 時，讀取完整 JSON 逐章撰寫；未達門檻或沒有候選時，改由 `draft_from_outline` 節點用一次 LLM 呼叫直接依大綱撰寫所有章節，不讀取完整案例 JSON，也不輸出「待補」佔位。只有計畫、尚無大綱時仍匯出規劃進度。JSON 資料只作為範例，使用時產出文件會明示其虛構性。
+建立或修訂大綱時，`OPEN_SAMPLE_AGENT_GRAPH` 判斷需求是開放型或指定型、要單一方案／多個選項／比較指定對象，以及來源是可選還是必要。單一需求最多選一份案例；多選項與比較需求最多選五份不同案例，用 `read_document_sample` Tool 逐份讀取完整 JSON，分別決定採用為具體方案、僅供參考或不採用。修訂需求後若要沿用舊選案，會重新讀取所選案例、核對新固定條件與原採用角色；若不再適用，就重新搜尋 metadata 與完整案例。選案結果、要求數量、各輸出項目的案例來源及來源必要性保存在 Thread。同一案例可支援多個項目，但其 JSON 必須確實涵蓋各項目；必要來源的多選項與比較需求會額外核對各項覆蓋，所有要求的選項與指定比較對象都須有資料支撐，不足時請使用者補資料。若已選必要案例在匯出 DOCX 時讀取失敗，重新檢查覆蓋，不以一般性內容冒充有來源的個案結論。可選來源不足時，`draft_from_outline` 依大綱撰寫。舊版 Thread 沒有選案結果時，仍可在匯出時比對 metadata，達 0.55 門檻才讀完整 JSON。案例不足時仍保留要求的選項或比較對象。JSON 資料只作為範例；不同情境的案例不能改寫成使用者文件的事實。
+
+對話中的單純提問另走 `QUESTION_SAMPLE_AGENT_GRAPH`。LLM 先判斷問題是否真的需要預設案例資料；一般說明直接回答。需要時才用 `list_document_samples` Tool 讀取最多三種 D 類型的 metadata；找不到直接相關案例就不讀檔，找到後才用 `read_document_sample` Tool 讀取最多兩份已登錄 JSON。指定只用使用者資料或離題時不查案例；這條問答路徑不改動大綱。對話規劃及問答的 Tool request、完整 response 與決策 LLM trace 會保存在 Thread；本次 DOCX 產生的 Tool 紀錄在匯出當下產生，兩者分別列於最後的「AI Agent Tool 請求與取得資料」章節。
+
+選案 Agent 不會僅因 LLM 回傳 `mode=adopt` 就自動採用所有已讀案例。採用案例須有有效 ID；多選項或比較需求還須有對應的 `outputCoverage`。沒有對應到輸出項目的案例可降為參考，必要來源不足時仍會追問。
+
+單一需求要求必要案例資料時，另以完整 JSON 複核案例是否能支援指定核心主題或開放需求選定的具體方案；只具方法價值時降為參考，並重新套用必要來源檢查。這次複核的 LLM 請求與回覆會列入 DOCX 的 Tool 紀錄章節。
+
+多選項與比較需求在 DOCX 章節撰寫後，會再核對內文中的實質選項數量、指定對象與共同比較面向。核對器須指出章節內文中的對應片段；不足時依原來源模式重寫一次，第二次仍不足則停止匯出。JSON 路徑重寫時會重新執行逐章引用核對；使用者資料路徑仍只使用使用者已提供的內容。
 
 | 階段 | 目前使用 JSON | 將來改用結構化 DB 的接點 |
 | --- | --- | --- |
-| 候選預篩 | 只使用大綱規劃選出的 D ID，不擴展到同分類的其他 D 類型 | 以 DB 的 D ID 查詢候選列 |
-| metadata 比對 | `samples.load_document_type_sample_metadata()` 只讀 `data/document_type_sample_metadata/{D ID}.json` 的 title、description；`sample_matcher.match_document_type_sample()` 請 LLM 逐一評分並選出最高的相關案例 | 改由 DB 讀取指定 D 類型候選列的 title、description，沿用比對介面 |
-| 取完整資料 | 僅比對通過時，`json_evidence.retrieve_json_evidence()` 依選中的 `sampleId` 讀取 `data/document_type_samples/{sampleId}.json` | 將此函式改接 Repository／SQL 查詢，回傳相同的證據項目 |
+| 候選預篩 | 規劃階段使用用途分類選出的 D ID；舊版 Thread 匯出時使用大綱選出的 D ID，不擴展到同分類的其他 D 類型 | 以 DB 的 D ID 查詢候選列 |
+| metadata 比對 | `list_document_samples` Tool 只讀 `data/document_type_sample_metadata/{D ID}.json` 的 title、description；開放／指定 route 由 Agent 選案，舊版 Thread 匯出時由 `sample_matcher.match_document_type_sample()` 評分 | 改由 DB 讀取指定 D 類型候選列的 title、description，沿用比對介面 |
+| 取完整資料 | `read_document_sample` Tool 依選中的 `sampleIds` 逐份讀取 `data/document_type_samples/{sampleId}.json`，再轉成章節證據；舊版單份 `sampleId` 仍相容 | 將 Tool 的資料來源改接 Repository／SQL 查詢，回傳相同的案例結構 |
 | 低信心分支 | `docx_content_graph.draft_from_outline` 以一次結構化 LLM 呼叫，依大綱與使用者需求撰寫所有章節，不使用案例 JSON | 保留作為 DB 候選不足時的內容分支 |
-| 證據編號 | 案例情境 `CTX`、事實 `F1...`、模擬來源描述 `M1...`、假設 `A1...` | 以資料列 ID 或穩定的來源 ID 取代暫時編號 |
-| 逐章撰寫 | AI 依大綱章節重點，從該 D 案例的證據項目挑選可用內容 | 保留撰寫流程，改提供 DB 查詢結果 |
-| 引用檢查 | 程式確認 AI 回傳的證據 ID 存在；沒有依據的章節標「待補」 | 以資料列與來源權限檢查取代 JSON ID 檢查 |
-| DOCX 輸出 | 章節 Markdown 由既有轉換器寫成 Word 段落與表格，並列出可讀的資料依據；內部 ID 不顯示 | 保留輸出格式，將資料表與引用改為 DB 來源 |
+| 使用者資料分支 | `sourceMode=user_data` 時直接進入 `draft_from_user_data`，只根據本 Thread 的使用者聊天文字和大綱撰寫章節；不查案例 Tool，資料不足處明確說明。聊天文字超過 40000 字元時回報過長，不靜默截斷 | 將來可把使用者上傳的結構化資料接入這條分支 |
+| 證據編號 | 單份案例使用 `TITLE`、`SUB`、`PER`、`OBJ`、`CTX`、`NOTE`、`F1...`、`M1...`、`A1...`；多份案例加上 `S1_`、`S2_` 等前綴，並保存來源 `sampleId` | 以資料列 ID 或穩定的來源 ID 取代暫時編號 |
+| 逐章撰寫 | AI 依大綱章節重點挑選案例證據；案例不足時以通用知識補充一般性方法與規劃，具體事實仍需案例依據 | 保留撰寫流程，改提供 DB 查詢結果 |
+| 引用檢查 | 程式先確認證據 ID 存在，再由 LLM 逐章語意核對內文與案例證據；明確錯置、無關引用或缺少來源時修正一次並重查，仍不一致則停止匯出。合理改寫與一般性內容不要求逐字引用 | 以資料列與來源權限檢查取代 JSON ID 檢查，保留語意核對 |
+| DOCX 輸出 | 章節 Markdown 由既有轉換器寫成 Word 段落與表格；資料來源章節逐份完整列出案例標題、類型、對象、期間、目標、情境、事實、來源描述、假設與來源註記。每項事實標示是否由章節標記引用，內部 ID 不顯示 | 保留輸出格式，將資料表與引用改為 DB 來源 |
 
-目前不使用向量檢索。metadata 索引與完整案例分開保存，案例 ID 與檔名統一使用 `Dxx_後綴` 格式，預設案例由各 D 類型 metadata 的首筆指定；修改案例的標題、對象、目的或情境時，需同步更新索引中的 title、description。每份案例資料量小，所以通過 metadata 比對後，逐章撰寫會提供選中案例的全部證據項目，由 AI 選擇與章節相關者。低信心分支只根據大綱與使用者需求提供一般性內容，不宣稱有案例證據。`sourceMaterials` 只有模擬來源的描述，不代表已檢索或驗證真實文件。
+目前不使用向量檢索。metadata 索引與完整案例分開保存，案例 ID 與檔名統一使用 `Dxx_後綴` 格式，預設案例由各 D 類型 metadata 的首筆指定；修改案例的標題、對象、目的或情境時，需同步更新索引中的 title、description。每份案例資料量小，所以通過 metadata 比對後，逐章撰寫會提供選中案例的全部證據項目，由 AI 選擇與章節相關者。語意核對只比較內文與取回的案例 JSON，不驗證 JSON 本身是否符合現實。低信心分支只根據大綱與使用者需求提供一般性內容，不宣稱有案例證據。`sourceMaterials` 只有模擬來源的描述，不代表已檢索或驗證真實文件。

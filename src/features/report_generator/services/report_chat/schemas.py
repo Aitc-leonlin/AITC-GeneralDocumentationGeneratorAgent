@@ -121,6 +121,67 @@ class PendingClarification(BaseModel):
     purposes: list[DocumentPurpose] = Field(default_factory=list)
 
 
+class ReportOutputCoverage(BaseModel):
+    """文件的一個選項或比較對象，以及支援它的案例。"""
+
+    outputIndex: int = Field(ge=1)
+    label: str = Field(min_length=1, max_length=150)
+    sampleId: str = Field(min_length=1)
+
+
+class ReportSampleSelection(BaseModel):
+    """對話階段選出的案例及其在文件中的用途。"""
+
+    mode: Literal["adopt", "reference", "none"] = "none"
+    route: Literal["open", "specified", "none"] = "none"
+    outputMode: Literal["single", "multiple", "compare"] = "single"
+    requestedCount: int = Field(default=1, ge=1)
+    comparisonSubjects: list[str] = Field(default_factory=list)
+    outputCoverage: list[ReportOutputCoverage] = Field(default_factory=list)
+    sourceRequirement: Literal["optional", "required"] = "optional"
+    requiredSource: Literal["case", "user_data", "external", "any"] = "any"
+    sourceProvided: bool = False
+    sourceReason: str = ""
+    sampleId: str | None = None
+    sampleIds: list[str] = Field(default_factory=list)
+    adoptedSampleIds: list[str] = Field(default_factory=list)
+    chosenSubject: str = ""
+    chosenSubjects: list[str] = Field(default_factory=list)
+    reason: str = ""
+
+
+def required_source_satisfied(selection: ReportSampleSelection) -> bool:
+    """判斷必要來源是否已可供撰寫；測試案例不能取代真實外部查證。"""
+    if selection.sourceRequirement != "required":
+        return True
+    if selection.requiredSource == "external":
+        return False
+    if selection.requiredSource == "user_data":
+        return selection.sourceProvided
+    adopted_ids = set(selection.adoptedSampleIds)
+    if selection.mode == "adopt" and not adopted_ids and selection.sampleId:
+        adopted_ids.add(selection.sampleId)
+    case_complete = selection.mode == "adopt" and bool(adopted_ids)
+    if case_complete and selection.outputMode != "single":
+        coverage = [
+            item for item in selection.outputCoverage
+            if item.sampleId in adopted_ids and item.outputIndex <= selection.requestedCount
+        ]
+        indices = {item.outputIndex for item in coverage}
+        labels = {item.label.strip().casefold() for item in coverage}
+        case_complete = (
+            len(coverage) == selection.requestedCount
+            and len(indices) == selection.requestedCount
+            and len(labels) == selection.requestedCount
+        )
+        if case_complete and selection.outputMode == "compare":
+            case_complete = all(
+                subject.strip().casefold() in labels
+                for subject in selection.comparisonSubjects
+            )
+    return case_complete if selection.requiredSource == "case" else case_complete or selection.sourceProvided
+
+
 class ReportOutlineRequest(BaseModel):
     messages: list[ReportChatMessage] = Field(min_length=1, max_length=30)
     currentDocumentTypeId: str | None = Field(default=None, pattern=r"^D(?:0[1-9]|[12][0-9]|30)$")
@@ -130,6 +191,19 @@ class ReportOutlineRequest(BaseModel):
     currentPurposeOutline: PurposeDocumentOutline | None = None
     pendingClarification: PendingClarification | None = None
     currentSourceMode: Literal["default_json", "user_data"] | None = None
+    currentSampleSelection: ReportSampleSelection | None = None
+
+
+class ReportToolUsage(BaseModel):
+    """對話中實際執行的案例工具與其輸入、輸出。"""
+
+    toolName: Literal["list_document_samples", "read_document_sample"]
+    documentTypeIds: list[str] = Field(default_factory=list)
+    sampleId: str | None = None
+    resultCount: int | None = Field(default=None, ge=0)
+    status: Literal["success", "error"] = "success"
+    requestJson: str | None = None
+    responseJson: str | None = None
 
 
 class ReportOutlineResponse(BaseModel):
@@ -142,7 +216,9 @@ class ReportOutlineResponse(BaseModel):
     purposeOutline: PurposeDocumentOutline | None = None
     pendingClarification: PendingClarification | None = None
     sourceMode: Literal["default_json", "user_data"] | None = None
+    sampleSelection: ReportSampleSelection | None = None
     llmTraces: list[ReportLLMTrace] = Field(default_factory=list)
+    toolUsages: list[ReportToolUsage] = Field(default_factory=list)
 
 
 class ReportQuestionPlan(BaseModel):

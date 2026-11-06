@@ -90,7 +90,10 @@ def generate_report_thread_document(
             purpose_outline=state.purposeOutline,
             messages=state.messages,
             llm_traces=state.llmTraces,
+            tool_usages=state.toolUsages,
             use_sample_data=state.sourceMode != "user_data",
+            source_mode=state.sourceMode,
+            sample_selection=state.sampleSelection,
         )
     except (InvalidReportRequest, ValueError) as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
@@ -133,7 +136,10 @@ def stream_report_thread_document(
                     purpose_outline=state.purposeOutline,
                     messages=state.messages,
                     llm_traces=state.llmTraces,
+                    tool_usages=state.toolUsages,
                     use_sample_data=state.sourceMode != "user_data",
+                    source_mode=state.sourceMode,
+                    sample_selection=state.sampleSelection,
                     progress_callback=progress,
                 )
                 event_queue.put({

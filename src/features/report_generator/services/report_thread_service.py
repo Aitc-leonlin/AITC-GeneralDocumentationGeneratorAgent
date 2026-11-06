@@ -18,6 +18,7 @@ from src.features.report_generator.services.report_chat_service import (
     create_report_outline,
 )
 from src.features.report_generator.services.domain_report_service import ReportLLMTrace
+from src.features.report_generator.services.report_chat.schemas import ReportSampleSelection, ReportToolUsage
 from src.shared.database.connection import DatabaseIntegrityError
 from src.shared.database.serialization import database_json_dumps
 
@@ -43,7 +44,9 @@ class ReportThreadState(BaseModel):
     purposeOutline: PurposeDocumentOutline | None = None
     pendingClarification: PendingClarification | None = None
     sourceMode: Literal["default_json", "user_data"] | None = None
+    sampleSelection: ReportSampleSelection | None = None
     llmTraces: list[ReportLLMTrace] = Field(default_factory=list)
+    toolUsages: list[ReportToolUsage] = Field(default_factory=list)
 
 
 def _thread(row: Any) -> dict[str, Any]:
@@ -105,6 +108,7 @@ def add_report_thread_message(
             currentPurposeOutline=previous.purposeOutline,
             pendingClarification=previous.pendingClarification,
             currentSourceMode=previous.sourceMode,
+            currentSampleSelection=previous.sampleSelection,
         )
     )
     state = ReportThreadState(
@@ -120,7 +124,9 @@ def add_report_thread_message(
         purposeOutline=result.purposeOutline,
         pendingClarification=result.pendingClarification,
         sourceMode=result.sourceMode,
+        sampleSelection=result.sampleSelection,
         llmTraces=[*previous.llmTraces, *result.llmTraces],
+        toolUsages=[*previous.toolUsages, *result.toolUsages],
     )
     now = utc_now_iso()
     title = (existing or {}).get("title") or content[:80]

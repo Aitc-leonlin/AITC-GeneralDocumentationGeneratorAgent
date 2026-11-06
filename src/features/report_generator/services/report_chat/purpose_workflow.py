@@ -13,6 +13,7 @@ from .schemas import (
     DocumentPurpose, GeneralOutlineContent, PendingClarification,
     PurposeDocumentOutline, PurposeDocumentPlan, PurposeOutlineSection,
     PurposePlannedSection, ReportChatMessage, ReportOutlineRequest, ReportQuestionPlan,
+    ReportSampleSelection,
 )
 
 
@@ -43,6 +44,8 @@ def assess_purpose_readiness(
             "而且不同選擇會實質改變大綱時，才回傳 ready=false。"
             "缺少數值、資料來源、對象或期間可在大綱標待提供，不要因此追問。"
             "若使用者已清楚要求複合文件，直接繼續；若已回答前次追問，不要重問。"
+            "若使用者要求開放式推薦、任選菜色或地點等，這是授權系統選具體方案；"
+            "不得僅因未指定菜色、目的地或其他可選主題而追問。"
             "ready=false 時只問一個最關鍵、具體且可回答的問題，並填 missingDecision；"
             "ready=true 時 question 與 missingDecision 留空。\n"
             f"分類結果：{question_plan.model_dump_json()}\n"
@@ -121,6 +124,7 @@ class PurposeWorkflowState(TypedDict, total=False):
     current_plan: PurposeDocumentPlan | None
     current_outline: PurposeDocumentOutline | None
     source_mode: Literal["default_json", "user_data"] | None
+    sample_selection: ReportSampleSelection | None
     model: Any
     traces: list[ReportLLMTrace]
     strategy_guidance: dict[str, str]
@@ -154,13 +158,19 @@ def _plan_each_purpose(state: PurposeWorkflowState) -> PurposeWorkflowState:
                 "referenceSectionIds 與 contentTypeIds 只填確實相關的目錄 ID，可留空。"
                 "不要為了範本的必要章節硬加入不需要的內容。"
                 "先規劃大綱，不撰寫內文或捏造資料。"
+                "若案例已採用為具體方案，章節應圍繞選定主題；"
+                "若案例僅供參考，仍以使用者要求的主題為準。"
+                "若 outputMode=multiple，須規劃要求數量的不同選項，案例不足時"
+                "仍保留其餘選項的位置；若 outputMode=compare，須涵蓋所有指定"
+                "比較對象及共同的比較面向，不得把兩個對象合併成一個。"
                 f"此用途的規劃方式：{state['strategy_guidance'][purpose.purposeId]}\n"
                 f"用途：{purpose.model_dump_json()}\n"
                 f"參考文件範本：{json.dumps([item.model_dump(exclude={'suggestedSections'}) for item in references], ensure_ascii=False)}\n"
                 f"章節目錄：{json.dumps([{'id': item.id, 'name': item.name, 'purpose': item.purpose} for item in sections.values()], ensure_ascii=False)}\n"
                 f"內容種類目錄：{json.dumps([{'id': item.id, 'name': item.name, 'description': item.description} for item in contents.values()], ensure_ascii=False)}\n"
                 f"目前計畫：{state['current_plan'].model_dump_json() if state.get('current_plan') else 'null'}\n"
-                f"來源模式：{state.get('source_mode') or '尚未指定'}；目前尚未比對或載入測試 JSON。\n"
+                f"來源模式：{state.get('source_mode') or '尚未指定'}。\n"
+                f"案例選擇：{state['sample_selection'].model_dump_json() if state.get('sample_selection') else 'null'}\n"
                 f"對話：{json.dumps([message.model_dump() for message in state['messages']], ensure_ascii=False)}"
             ),
         )
@@ -236,13 +246,24 @@ def _draft_unified_outline(state: PurposeWorkflowState) -> PurposeWorkflowState:
             "sectionFocuses 每個 sectionKey 都要有一筆，不能新增章節；"
             "只寫各章將處理的重點，不寫完整內文、結論或虛構事實。"
             "使用者未提供的對象、期間填待提供。"
-            "sourcePlan 要說明：若來源模式為 user_data，只使用使用者資料；"
-            "其他情況在 DOCX 匯出時才用大綱和候選案例 metadata 比對，"
-            "只有具體主題相關且達信心門檻才引用測試 JSON，否則標示待補。"
+            "若案例選擇 mode=adopt，title、subject、objective 與章節重點應明確呈現"
+            "該案例作為本文件選定的示例主題；使用者未指定的日期、金額、人數或偏好"
+            "不可因案例而變成使用者的真實條件。"
+            "若 mode=reference，只在來源規劃說明其參考用途，不改寫文件核心主題。"
+            "sourcePlan 要說明所選案例為參考／測試資料，具體事實仍須核對；"
+            "若沒有選案例，說明依大綱與使用者需求撰寫。"
+            "若 sourceRequirement=required，sourcePlan 須指出本文件依據哪種已提供資料；"
+            "使用者貼上的內容不可說成系統已獨立查證。"
+            "outputMode=multiple 時，大綱須清楚呈現 requestedCount 個選項；"
+            "outputMode=compare 時，須明確列出 comparisonSubjects 中每個對象"
+            "及共同比較面向，即使只有部分案例可用也要保留所有對象；"
+            "outputCoverage 指出每個輸出項目由哪份案例支援，不能互換。"
+            "若來源模式為 user_data，只使用使用者資料。"
             "延續目前大綱中未被最新訊息更改的要求。\n"
             f"統一計畫：{plan.model_dump_json()}\n"
             f"目前大綱：{state['current_outline'].model_dump_json() if state.get('current_outline') else 'null'}\n"
-            f"來源模式：{state.get('source_mode') or '尚未指定'}；目前尚未比對或載入測試 JSON。\n"
+            f"來源模式：{state.get('source_mode') or '尚未指定'}。\n"
+            f"案例選擇：{state['sample_selection'].model_dump_json() if state.get('sample_selection') else 'null'}\n"
             f"對話：{json.dumps([message.model_dump() for message in state['messages']], ensure_ascii=False)}"
         ),
     )
@@ -254,8 +275,23 @@ def _draft_unified_outline(state: PurposeWorkflowState) -> PurposeWorkflowState:
             contentTypeId=item, name=contents[item].name, description=contents[item].description,
         ) for item in section.contentTypeIds],
     ) for section in plan.sections]
+    selection = state.get("sample_selection")
+    chosen_subject = ""
+    if selection:
+        if selection.outputMode == "single" and selection.mode == "adopt":
+            chosen_subject = selection.chosenSubject
+        elif selection.outputMode == "compare" and selection.comparisonSubjects:
+            chosen_subject = "、".join(selection.comparisonSubjects)[:150]
+        elif (
+            selection.outputMode == "multiple"
+            and len(selection.chosenSubjects) == selection.requestedCount
+        ):
+            chosen_subject = "、".join(selection.chosenSubjects)[:150]
+    title = draft.title
+    if chosen_subject and selection and selection.outputMode == "single" and chosen_subject not in title:
+        title = f"{chosen_subject}｜{title}"[:150]
     return {"outline": PurposeDocumentOutline(
-        title=draft.title, subject=draft.subject, period=draft.period,
+        title=title, subject=chosen_subject or draft.subject, period=draft.period,
         objective=draft.objective, purposes=plan.purposes, sections=sections,
         sourcePlan=draft.sourcePlan,
     ), "traces": traces}
@@ -279,10 +315,12 @@ def plan_purpose_document(
     traces: list[ReportLLMTrace], current_plan: PurposeDocumentPlan | None = None,
     current_outline: PurposeDocumentOutline | None = None,
     source_mode: Literal["default_json", "user_data"] | None = None,
+    sample_selection: ReportSampleSelection | None = None,
 ) -> tuple[PurposeDocumentPlan, PurposeDocumentOutline, list[ReportLLMTrace]]:
     result = PURPOSE_WORKFLOW_GRAPH.invoke({
         "purposes": purposes, "messages": messages, "model": model, "traces": traces,
         "current_plan": current_plan, "current_outline": current_outline,
         "source_mode": source_mode,
+        "sample_selection": sample_selection,
     })
     return result["plan"], result["outline"], result["traces"]
